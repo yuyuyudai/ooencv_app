@@ -14,8 +14,10 @@ import org.opencv.android.OpenCVLoader;
 import org.opencv.core.Core;
 import org.opencv.core.CvType;
 import org.opencv.core.Mat;
+import org.opencv.core.Scalar;
 import org.opencv.imgproc.Imgproc;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -114,7 +116,9 @@ public class MainActivity extends CameraActivity implements CameraBridgeViewBase
         //Imgproc.threshold(inputFrame.gray(), mMat, 0.0, 255.0, Imgproc.THRESH_OTSU); //grayscale binarization with Ohtsu
         //return mMat;//これで表示
 
-        Mat rgbImage = inputFrame.rgba();//rgb画像を取得
+
+        //--------------hsv変換
+        /*Mat rgbImage = inputFrame.rgba();//rgb画像を取得
         Mat hsvImage = new Mat();//空のhsv画像を作成
 
         // RGBからHSVに変換
@@ -123,7 +127,36 @@ public class MainActivity extends CameraActivity implements CameraBridgeViewBase
         // ここでhsvImageを使用してさまざまな処理を行うことができます
 
         // 画像を表示
-        return hsvImage;
+        return hsvImage;*/
+
+
+
+        Mat rgbaImage = inputFrame.rgba(); // RGB画像を取得
+        Mat hsvImage = new Mat(); // 空のHSV画像を作成
+        Mat hueChannel = new Mat(); // 色相チャンネル画像を格納
+        Mat binaryImage = new Mat(); // 二値化画像を格納
+
+        // RGBからHSVに変換
+        Imgproc.cvtColor(rgbaImage, hsvImage, Imgproc.COLOR_RGB2HSV);
+
+        // 色相チャンネルを抽出
+        List<Mat> channels = new ArrayList<>();
+        Core.split(hsvImage, channels);
+        hueChannel = channels.get(0);
+
+        // オレンジ色の抽出
+        Scalar lowerBound = new Scalar(11, 0, 0);
+        Scalar upperBound = new Scalar(25, 255, 255);
+        Core.inRange(hsvImage, lowerBound, upperBound, binaryImage);
+
+        // 二値化画像をもとのRGB画像と合成
+        Mat resultImage = new Mat();
+        rgbaImage.copyTo(resultImage, binaryImage);
+
+        // 画像を表示
+        return resultImage;
+
+
 
     }
 }
