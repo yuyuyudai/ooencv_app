@@ -104,14 +104,26 @@ public class MainActivity extends CameraActivity implements CameraBridgeViewBase
     }
     private Mat mMat;
     public Mat onCameraFrame(CameraBridgeViewBase.CvCameraViewFrame inputFrame) {
+        //-------https://coskxlabsite.stars.ne.jp/html/android/OpenCVpreview/OpenCVpreview_A.html
         //return inputFrame.rgba();
         //mMat= inputFrame.rgba();    //color
         //mMat= inputFrame.gray();    //grayscale
         //Core.bitwise_not(inputFrame.rgba(), mMat); //reversed
         //Core.bitwise_not(inputFrame.gray(), mMat); //grayscale reversed
         //Imgproc.Canny(inputFrame.gray(), mMat, 100, 200); //grayscale canny filtering
-        Imgproc.threshold(inputFrame.gray(), mMat, 0.0, 255.0, Imgproc.THRESH_OTSU); //grayscale binarization with Ohtsu
-        return mMat;
+        //Imgproc.threshold(inputFrame.gray(), mMat, 0.0, 255.0, Imgproc.THRESH_OTSU); //grayscale binarization with Ohtsu
+        //return mMat;//これで表示
+
+        Mat rgbImage = inputFrame.rgba();//rgb画像を取得
+        Mat hsvImage = new Mat();//空のhsv画像を作成
+
+        // RGBからHSVに変換
+        Imgproc.cvtColor(rgbImage, hsvImage, Imgproc.COLOR_RGB2HSV);
+
+        // ここでhsvImageを使用してさまざまな処理を行うことができます
+
+        // 画像を表示
+        return hsvImage;
 
     }
 }
