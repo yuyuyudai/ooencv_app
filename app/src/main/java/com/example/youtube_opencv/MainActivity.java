@@ -135,6 +135,7 @@ public class MainActivity extends CameraActivity implements CameraBridgeViewBase
         Mat hsvImage = new Mat(); // 空のHSV画像を作成
         Mat hueChannel = new Mat(); // 色相チャンネル画像を格納
         Mat binaryImage = new Mat(); // 二値化画像を格納
+        Mat combineImage = new Mat();
 
         // RGBからHSVに変換
         Imgproc.cvtColor(rgbaImage, hsvImage, Imgproc.COLOR_RGB2HSV);
@@ -144,10 +145,37 @@ public class MainActivity extends CameraActivity implements CameraBridgeViewBase
         Core.split(hsvImage, channels);
         hueChannel = channels.get(0);
 
+        // 濃い赤色の抽出
+        Scalar dr_lowerBound = new Scalar(0, 50, 0);
+        Scalar dr_upperBound = new Scalar(1, 255, 255);
+        Core.inRange(hsvImage, dr_lowerBound, dr_upperBound, binaryImage);
+
+
+
+        // 緑色の抽出
+        Scalar gr_lowerBound = new Scalar(26, 30, 50);
+        Scalar gr_upperBound = new Scalar(48, 255, 255);
+        Core.inRange(hsvImage, gr_lowerBound, gr_upperBound, combineImage);
+
+        Core.bitwise_or(binaryImage, combineImage, binaryImage);
+
+
+
+        // 赤色の抽出
+        Scalar r_lowerBound = new Scalar(2, 50, 50);
+        Scalar r_upperBound = new Scalar(10, 255, 255);
+        Core.inRange(hsvImage, r_lowerBound, r_upperBound, combineImage);
+
+        Core.bitwise_or(binaryImage, combineImage, binaryImage);
+
+
         // オレンジ色の抽出
-        Scalar lowerBound = new Scalar(11, 0, 0);
-        Scalar upperBound = new Scalar(25, 255, 255);
-        Core.inRange(hsvImage, lowerBound, upperBound, binaryImage);
+        Scalar o_lowerBound = new Scalar(11, 0, 0);
+        Scalar o_upperBound = new Scalar(25, 255, 255);
+        Core.inRange(hsvImage, o_lowerBound, o_upperBound, combineImage);
+
+        Core.bitwise_or(binaryImage, combineImage, binaryImage);
+
 
         // 二値化画像をもとのRGB画像と合成
         Mat resultImage = new Mat();
