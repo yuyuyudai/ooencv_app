@@ -15,7 +15,8 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />-->
 
-    <org.opencv.android.JavaCameraView
+    <!--<org.opencv.android.JavaCameraView-->
+    <jp.gr.java_conf.coskx.ocvpreplus.JavaCamera2ViewPlus
         android:id="@+id/camera_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -23,6 +24,7 @@
         tools:layout_editor_absoluteX="0dp"
         tools:layout_editor_absoluteY="0dp"
         app:camera_id="back"
-        app:show_fps="true"/>
+        app:show_fps="true"
+        tools:ignore="MissingClass" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

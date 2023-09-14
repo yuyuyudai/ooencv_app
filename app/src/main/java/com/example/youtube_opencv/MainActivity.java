@@ -63,6 +63,8 @@ public class MainActivity extends CameraActivity implements CameraBridgeViewBase
         mOpenCvCameraView.setVisibility(SurfaceView.VISIBLE);
 
         mOpenCvCameraView.setCvCameraViewListener(this);
+        //requesting previewsize option (maxWidth > maxHeight)
+        mOpenCvCameraView.setMaxFrameSize(960, 720);
     }
 
     @Override
