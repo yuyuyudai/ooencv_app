@@ -5,6 +5,7 @@ import android.util.Log;
 import android.view.MenuItem;
 import android.view.SurfaceView;
 import android.view.WindowManager;
+import android.widget.TextView;
 
 import org.opencv.android.BaseLoaderCallback;
 import org.opencv.android.CameraActivity;
@@ -152,23 +153,14 @@ public class MainActivity extends CameraActivity implements CameraBridgeViewBase
         Scalar dr_upperBound = new Scalar(1, 255, 255);
         Core.inRange(hsvImage, dr_lowerBound, dr_upperBound, binaryImage);
 
-
-
-        // 緑色の抽出
-        Scalar gr_lowerBound = new Scalar(26, 30, 50);
-        Scalar gr_upperBound = new Scalar(48, 255, 255);
-        Core.inRange(hsvImage, gr_lowerBound, gr_upperBound, combineImage);
-
-        Core.bitwise_or(binaryImage, combineImage, binaryImage);
-
-
-
         // 赤色の抽出
         Scalar r_lowerBound = new Scalar(2, 50, 50);
         Scalar r_upperBound = new Scalar(10, 255, 255);
         Core.inRange(hsvImage, r_lowerBound, r_upperBound, combineImage);
 
         Core.bitwise_or(binaryImage, combineImage, binaryImage);
+
+
 
 
         // オレンジ色の抽出
@@ -179,9 +171,34 @@ public class MainActivity extends CameraActivity implements CameraBridgeViewBase
         Core.bitwise_or(binaryImage, combineImage, binaryImage);
 
 
+        Mat redImage = new Mat();
+        rgbaImage.copyTo(redImage, binaryImage);
+
+        // 緑色の抽出
+        Scalar gr_lowerBound = new Scalar(26, 30, 50);
+        Scalar gr_upperBound = new Scalar(48, 255, 255);
+        Core.inRange(hsvImage, gr_lowerBound, gr_upperBound, combineImage);
+
+        Core.bitwise_or(binaryImage, combineImage, binaryImage);
+
+
+
+
+
         // 二値化画像をもとのRGB画像と合成
         Mat resultImage = new Mat();
         rgbaImage.copyTo(resultImage, binaryImage);
+
+        //TextView myTextView = findViewById(R.id.mytextView);
+        //int pixelsInMask1 = Core.countNonZero(redImage);
+        //int pixelsInMask2 = Core.countNonZero(resultImage);
+        // 一方のマスクがもう一方のマスクに占める割合を計算
+        //double ratio = (double) pixelsInMask1 / pixelsInMask2;
+        //myTextView.setText("Variable Value: " + ratio);
+
+
+
+
 
         // 画像を表示
         return resultImage;
