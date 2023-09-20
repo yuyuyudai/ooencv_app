@@ -18,12 +18,18 @@ import org.opencv.core.Mat;
 import org.opencv.core.Scalar;
 import org.opencv.imgproc.Imgproc;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+
 public class MainActivity extends CameraActivity implements CameraBridgeViewBase.CvCameraViewListener2 {
     private static final String TAG = "OCVSample::Activity";
+
+    public int a=0;
+    public int b=0;
+    public TextView pixelCountTextView;
 
     private CameraBridgeViewBase mOpenCvCameraView;
     private boolean              mIsJavaCamera = true;
@@ -46,11 +52,14 @@ public class MainActivity extends CameraActivity implements CameraBridgeViewBase
         }
     };
 
+
     public MainActivity() {
         Log.i(TAG, "Instantiated new " + this.getClass());
     }
 
     /** Called when the activity is first created. */
+
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         Log.i(TAG, "called onCreate");
@@ -58,6 +67,12 @@ public class MainActivity extends CameraActivity implements CameraBridgeViewBase
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
         setContentView(R.layout.activity_main);
+
+
+        String str="15";
+        pixelCountTextView = (TextView)findViewById(R.id.pixelsInMask1str);
+
+        //pixelCountTextView.setText(String.valueOf(a));
 
         mOpenCvCameraView = (CameraBridgeViewBase) findViewById(R.id.camera_view);
 
@@ -108,6 +123,10 @@ public class MainActivity extends CameraActivity implements CameraBridgeViewBase
         mMat.release();
     }
     private Mat mMat;
+    private static int ratio = 0;
+
+    private static final int SUBSAMPLING_FACTOR=3;
+    private int frameCounter=0;
     public Mat onCameraFrame(CameraBridgeViewBase.CvCameraViewFrame inputFrame) {
         //-------https://coskxlabsite.stars.ne.jp/html/android/OpenCVpreview/OpenCVpreview_A.html
         //return inputFrame.rgba();
@@ -132,7 +151,10 @@ public class MainActivity extends CameraActivity implements CameraBridgeViewBase
         // 画像を表示
         return hsvImage;*/
 
-
+        frameCounter++;
+        if (frameCounter % SUBSAMPLING_FACTOR != 0) {
+            return null; // フレームを処理せずに返す
+        }
 
         Mat rgbaImage = inputFrame.rgba(); // RGB画像を取得
         Mat hsvImage = new Mat(); // 空のHSV画像を作成
@@ -160,7 +182,8 @@ public class MainActivity extends CameraActivity implements CameraBridgeViewBase
 
         Core.bitwise_or(binaryImage, combineImage, binaryImage);
 
-
+        //赤の条件厳しく
+        //double red = Core.countNonZero(binaryImage);
 
 
         // オレンジ色の抽出
@@ -170,9 +193,9 @@ public class MainActivity extends CameraActivity implements CameraBridgeViewBase
 
         Core.bitwise_or(binaryImage, combineImage, binaryImage);
 
+        //赤の条件ゆるく
+        double red = Core.countNonZero(binaryImage);
 
-        Mat redImage = new Mat();
-        rgbaImage.copyTo(redImage, binaryImage);
 
         // 緑色の抽出
         Scalar gr_lowerBound = new Scalar(26, 30, 50);
@@ -182,26 +205,43 @@ public class MainActivity extends CameraActivity implements CameraBridgeViewBase
         Core.bitwise_or(binaryImage, combineImage, binaryImage);
 
 
-
+        double all = Core.countNonZero(binaryImage);
 
 
         // 二値化画像をもとのRGB画像と合成
         Mat resultImage = new Mat();
         rgbaImage.copyTo(resultImage, binaryImage);
 
-        //TextView myTextView = findViewById(R.id.mytextView);
-        //int pixelsInMask1 = Core.countNonZero(redImage);
-        //int pixelsInMask2 = Core.countNonZero(resultImage);
+        //TextView text = (TextView) findViewById(R.id.pixelsInMask1str);
+
         // 一方のマスクがもう一方のマスクに占める割合を計算
-        //double ratio = (double) pixelsInMask1 / pixelsInMask2;
-        //myTextView.setText("Variable Value: " + ratio);
+        double ratio =red/all*100;
+
+        BigDecimal bd = new BigDecimal(ratio);
+        BigDecimal ripe_ratio = bd.setScale(2,BigDecimal.ROUND_HALF_UP);
+
+
+
+        runOnUiThread(new Runnable(){
+
+            @Override
+            public void run() {
+                pixelCountTextView.setText(String.valueOf(ripe_ratio));
+            }
+        });
+
+
+        //pixelCountTextView.setText(String.valueOf(a));
+        //pixelCountTextView.setText(abc);
+
+
 
 
 
 
 
         // 画像を表示
-        return resultImage;
+        return rgbaImage;
 
 
 
