@@ -15,7 +15,9 @@ import org.opencv.android.OpenCVLoader;
 import org.opencv.core.Core;
 import org.opencv.core.CvType;
 import org.opencv.core.Mat;
+import org.opencv.core.Rect;
 import org.opencv.core.Scalar;
+import org.opencv.core.Size;
 import org.opencv.imgproc.Imgproc;
 
 import java.math.BigDecimal;
@@ -156,14 +158,30 @@ public class MainActivity extends CameraActivity implements CameraBridgeViewBase
             return null; // フレームを処理せずに返す
         }
 
-        Mat rgbaImage = inputFrame.rgba(); // RGB画像を取得
+
+
+        //トリミング処理
+        // トリミングおよびリサイズのパラメータを定義
+        Rect cropRect = new Rect(300, 80, 240,320 );  // トリミングする領域を定義
+        Size newSize = new Size(720, 960);   // 出力サイズを定義
+
+        // 入力画像をトリミングおよびリサイズ
+        Mat croppedResizedImage = new Mat();
+        Mat inputImage = inputFrame.rgba();  // inputFrame に元の画像が含まれていると仮定
+        Mat croppedImage = new Mat(inputImage, cropRect);  // 画像をトリミング
+        Imgproc.resize(croppedImage, croppedResizedImage, newSize);  // トリミングした画像をリサイズ
+
+        // これで croppedResizedImage 上でさらなる処理を実行できます
+
+
+        //Mat rgbaImage = inputFrame.rgba(); // RGB画像を取得
         Mat hsvImage = new Mat(); // 空のHSV画像を作成
         Mat hueChannel = new Mat(); // 色相チャンネル画像を格納
         Mat binaryImage = new Mat(); // 二値化画像を格納
         Mat combineImage = new Mat();
 
         // RGBからHSVに変換
-        Imgproc.cvtColor(rgbaImage, hsvImage, Imgproc.COLOR_RGB2HSV);
+        Imgproc.cvtColor(croppedResizedImage, hsvImage, Imgproc.COLOR_RGB2HSV);
 
         // 色相チャンネルを抽出
         List<Mat> channels = new ArrayList<>();
@@ -177,13 +195,13 @@ public class MainActivity extends CameraActivity implements CameraBridgeViewBase
 
         // 赤色の抽出
         Scalar r_lowerBound = new Scalar(2, 50, 50);
-        Scalar r_upperBound = new Scalar(10, 255, 255);
+        Scalar r_upperBound = new Scalar(25, 255, 255);
         Core.inRange(hsvImage, r_lowerBound, r_upperBound, combineImage);
 
         Core.bitwise_or(binaryImage, combineImage, binaryImage);
 
         //赤の条件厳しく
-        //double red = Core.countNonZero(binaryImage);
+        double red = Core.countNonZero(binaryImage);
 
 
         // オレンジ色の抽出
@@ -194,7 +212,7 @@ public class MainActivity extends CameraActivity implements CameraBridgeViewBase
         Core.bitwise_or(binaryImage, combineImage, binaryImage);
 
         //赤の条件ゆるく
-        double red = Core.countNonZero(binaryImage);
+        //double red = Core.countNonZero(binaryImage);
 
 
         // 緑色の抽出
@@ -210,7 +228,7 @@ public class MainActivity extends CameraActivity implements CameraBridgeViewBase
 
         // 二値化画像をもとのRGB画像と合成
         Mat resultImage = new Mat();
-        rgbaImage.copyTo(resultImage, binaryImage);
+        croppedResizedImage.copyTo(resultImage, binaryImage);
 
         //TextView text = (TextView) findViewById(R.id.pixelsInMask1str);
 
@@ -241,7 +259,7 @@ public class MainActivity extends CameraActivity implements CameraBridgeViewBase
 
 
         // 画像を表示
-        return rgbaImage;
+        return inputImage;
 
 
 
