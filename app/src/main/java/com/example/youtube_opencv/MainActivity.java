@@ -158,16 +158,26 @@ public class MainActivity extends CameraActivity implements CameraBridgeViewBase
             return null; // フレームを処理せずに返す
         }
 
-
+        Mat inputImage = inputFrame.rgba();  // inputFrame に元の画像が含まれていると仮定
 
         //トリミング処理
         // トリミングおよびリサイズのパラメータを定義
-        Rect cropRect = new Rect(300, 80, 240,320 );  // トリミングする領域を定義
-        Size newSize = new Size(720, 960);   // 出力サイズを定義
+        // 中心座標の計算
+        int centerX = inputImage.width() / 2;
+        int centerY = inputImage.height() / 2;
+
+        // 1/2サイズの画像の切り出し
+        int halfWidth = inputImage.width();
+        int halfHeight = inputImage.height() / 2;
+
+        int startX = centerX - halfWidth / 2;
+        int startY = centerY - halfHeight / 2;
+        Rect cropRect = new Rect(startX, startY, halfWidth,halfHeight );  // トリミングする領域を定義
+        Size newSize = new Size(inputImage.width(),inputImage.height()); // 出力サイズを定義
 
         // 入力画像をトリミングおよびリサイズ
         Mat croppedResizedImage = new Mat();
-        Mat inputImage = inputFrame.rgba();  // inputFrame に元の画像が含まれていると仮定
+        //Mat inputImage = inputFrame.rgba();  // inputFrame に元の画像が含まれていると仮定
         Mat croppedImage = new Mat(inputImage, cropRect);  // 画像をトリミング
         Imgproc.resize(croppedImage, croppedResizedImage, newSize);  // トリミングした画像をリサイズ
 
@@ -223,7 +233,7 @@ public class MainActivity extends CameraActivity implements CameraBridgeViewBase
         Core.bitwise_or(binaryImage, combineImage, binaryImage);
 
 
-        double all = Core.countNonZero(binaryImage);
+        double all = Core.countNonZero(binaryImage) + 0.1;
 
 
         // 二値化画像をもとのRGB画像と合成
