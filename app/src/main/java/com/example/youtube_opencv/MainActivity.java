@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.SurfaceView;
+import android.view.View;
 import android.view.WindowManager;
 import android.widget.TextView;
 
@@ -29,9 +30,10 @@ import java.util.List;
 public class MainActivity extends CameraActivity implements CameraBridgeViewBase.CvCameraViewListener2 {
     private static final String TAG = "OCVSample::Activity";
 
-    public int a=0;
-    public int b=0;
+
     public TextView pixelCountTextView;
+    public View coloredBox_harf;
+    public View coloredBox_ripe;
 
     private CameraBridgeViewBase mOpenCvCameraView;
     private boolean              mIsJavaCamera = true;
@@ -71,10 +73,10 @@ public class MainActivity extends CameraActivity implements CameraBridgeViewBase
         setContentView(R.layout.activity_main);
 
 
-        String str="15";
-        pixelCountTextView = (TextView)findViewById(R.id.pixelsInMask1str);
 
-        //pixelCountTextView.setText(String.valueOf(a));
+        pixelCountTextView = (TextView)findViewById(R.id.pixelsInMask1str);
+        coloredBox_harf = findViewById(R.id.color_box_harf);
+        coloredBox_ripe = findViewById(R.id.color_box_ripe);
 
         mOpenCvCameraView = (CameraBridgeViewBase) findViewById(R.id.camera_view);
 
@@ -127,7 +129,7 @@ public class MainActivity extends CameraActivity implements CameraBridgeViewBase
     private Mat mMat;
     private static int ratio = 0;
 
-    private static final int SUBSAMPLING_FACTOR=3;
+    private static final int SUBSAMPLING_FACTOR=5;
     private int frameCounter=0;
     public Mat onCameraFrame(CameraBridgeViewBase.CvCameraViewFrame inputFrame) {
         //-------https://coskxlabsite.stars.ne.jp/html/android/OpenCVpreview/OpenCVpreview_A.html
@@ -167,7 +169,7 @@ public class MainActivity extends CameraActivity implements CameraBridgeViewBase
         int centerY = inputImage.height() / 2;
 
         // 1/2サイズの画像の切り出し
-        int halfWidth = inputImage.width();
+        int halfWidth = inputImage.width()/2;
         int halfHeight = inputImage.height() / 2;
 
         int startX = centerX - halfWidth / 2;
@@ -183,7 +185,8 @@ public class MainActivity extends CameraActivity implements CameraBridgeViewBase
 
         // これで croppedResizedImage 上でさらなる処理を実行できます
 
-
+        Log.i(TAG, "元の画像の幅: " + inputImage.width());
+        Log.i(TAG, "元の画像の高さ: " + inputImage.height());
         //Mat rgbaImage = inputFrame.rgba(); // RGB画像を取得
         Mat hsvImage = new Mat(); // 空のHSV画像を作成
         Mat hueChannel = new Mat(); // 色相チャンネル画像を格納
@@ -198,20 +201,38 @@ public class MainActivity extends CameraActivity implements CameraBridgeViewBase
         Core.split(hsvImage, channels);
         hueChannel = channels.get(0);
 
-        // 濃い赤色の抽出
+        // 濃い赤色の抽出(Hueが0付近)
         Scalar dr_lowerBound = new Scalar(0, 50, 0);
-        Scalar dr_upperBound = new Scalar(1, 255, 255);
+        Scalar dr_upperBound = new Scalar(1, 255, 155);
         Core.inRange(hsvImage, dr_lowerBound, dr_upperBound, binaryImage);
+        //Core.bitwise_or(binaryImage, combineImage, binaryImage);
+
+        // 濃い赤色の抽出(Hueが179付近)
+        Scalar high_dr_lowerBound = new Scalar(178,50,0);
+        Scalar high_dr_upperBound = new Scalar(179,255,255);
+
+        Core.inRange(hsvImage, high_dr_lowerBound, high_dr_upperBound, combineImage);
+        Core.bitwise_or(binaryImage, combineImage, binaryImage);
+
+        //赤の条件厳しく(大)
+        double red = Core.countNonZero(binaryImage);
+
 
         // 赤色の抽出
         Scalar r_lowerBound = new Scalar(2, 50, 50);
         Scalar r_upperBound = new Scalar(25, 255, 255);
         Core.inRange(hsvImage, r_lowerBound, r_upperBound, combineImage);
-
         Core.bitwise_or(binaryImage, combineImage, binaryImage);
 
-        //赤の条件厳しく
-        double red = Core.countNonZero(binaryImage);
+        /*//赤色の抽出（Hueが179付近）
+        Scalar high_r_lowerBound = new Scalar(2, 50, 50);
+        Scalar high_r_upperBound = new Scalar(25, 255, 255);
+        Core.inRange(hsvImage, high_r_lowerBound, high_r_upperBound, combineImage);
+
+        Core.bitwise_or(binaryImage, combineImage, binaryImage);
+*/
+        //赤の条件厳しく(中)
+        //double red = Core.countNonZero(binaryImage);
 
 
         // オレンジ色の抽出
@@ -221,7 +242,7 @@ public class MainActivity extends CameraActivity implements CameraBridgeViewBase
 
         Core.bitwise_or(binaryImage, combineImage, binaryImage);
 
-        //赤の条件ゆるく
+        //赤の条件（ゆるく）
         //double red = Core.countNonZero(binaryImage);
 
 
@@ -254,8 +275,18 @@ public class MainActivity extends CameraActivity implements CameraBridgeViewBase
 
             @Override
             public void run() {
-                pixelCountTextView.setText(String.valueOf(ripe_ratio));
+                pixelCountTextView.setText(String.valueOf(ripe_ratio)+"%");
+
+                if (ratio > 10) {
+                    coloredBox_harf.setVisibility(View.VISIBLE); // 表示
+                    coloredBox_ripe.setVisibility(View.GONE);
+                } else {
+                    coloredBox_harf.setVisibility(View.GONE); // 非表示
+                    coloredBox_ripe.setVisibility(View.VISIBLE);
+                }
             }
+
+
         });
 
 
@@ -268,9 +299,9 @@ public class MainActivity extends CameraActivity implements CameraBridgeViewBase
 
 
 
-        // 画像を表示
+        // 画像を表示////
         return inputImage;
-
+        //return croppedResizedImage;
 
 
     }
