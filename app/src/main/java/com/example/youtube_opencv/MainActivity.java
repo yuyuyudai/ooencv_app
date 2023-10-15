@@ -1,6 +1,8 @@
 package com.example.youtube_opencv;
 
+import android.content.Context;
 import android.os.Bundle;
+import android.os.Vibrator;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.SurfaceView;
@@ -76,6 +78,8 @@ public class MainActivity extends CameraActivity implements CameraBridgeViewBase
 
 
 
+        //((Vibrator) getSystemService(Context.VIBRATOR_SERVICE)).vibrate(1000);
+
         pixelCountTextView = (TextView)findViewById(R.id.pixelsInMask1str);
         coloredText_overripe = findViewById(R.id.color_box_overripe_text);
         coloredBox_harf = findViewById(R.id.color_box_harf);
@@ -130,6 +134,8 @@ public class MainActivity extends CameraActivity implements CameraBridgeViewBase
     public void onCameraViewStopped() {
         mMat.release();
     }
+
+
     private Mat mMat;
     private static int ratio = 0;
 
@@ -211,15 +217,15 @@ public class MainActivity extends CameraActivity implements CameraBridgeViewBase
         Core.inRange(hsvImage, dr_lowerBound, dr_upperBound, binaryImage);
         //Core.bitwise_or(binaryImage, combineImage, binaryImage);
 
-        // 濃い赤色の抽出(Hueが179付近)
+        /*// 濃い赤色の抽出(Hueが179付近)
         Scalar high_dr_lowerBound = new Scalar(178,50,0);
         Scalar high_dr_upperBound = new Scalar(179,255,255);
 
         Core.inRange(hsvImage, high_dr_lowerBound, high_dr_upperBound, combineImage);
-        Core.bitwise_or(binaryImage, combineImage, binaryImage);
+        Core.bitwise_or(binaryImage, combineImage, binaryImage);*/
 
         //赤の条件厳しく(大)
-        double red = Core.countNonZero(binaryImage);
+        //double red = Core.countNonZero(binaryImage);
 
 
         // 赤色の抽出
@@ -236,7 +242,7 @@ public class MainActivity extends CameraActivity implements CameraBridgeViewBase
         Core.bitwise_or(binaryImage, combineImage, binaryImage);
 */
         //赤の条件厳しく(中)
-        //double red = Core.countNonZero(binaryImage);
+        double red = Core.countNonZero(binaryImage);
 
 
         // オレンジ色の抽出
@@ -275,6 +281,8 @@ public class MainActivity extends CameraActivity implements CameraBridgeViewBase
 
 
 
+
+
         runOnUiThread(new Runnable(){
 
             @Override
@@ -282,6 +290,7 @@ public class MainActivity extends CameraActivity implements CameraBridgeViewBase
                 pixelCountTextView.setText(String.valueOf(ripe_ratio)+"%");
 
                 if (ratio < 40 ) {//熟度が40%未満ならば説明文を表示
+
                     introduct.setVisibility(View.VISIBLE);
                     coloredBox_harf.setVisibility(View.GONE);
                     coloredBox_ripe.setVisibility(View.GONE);
@@ -301,6 +310,7 @@ public class MainActivity extends CameraActivity implements CameraBridgeViewBase
                     coloredBox_harf.setVisibility(View.GONE);
                     coloredBox_ripe.setVisibility(View.GONE);
                     coloredText_overripe.setVisibility(View.VISIBLE);
+                    ((Vibrator) getSystemService(Context.VIBRATOR_SERVICE)).vibrate(100);
                 }
             }
 
