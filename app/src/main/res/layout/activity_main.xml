@@ -62,13 +62,16 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.742" />
 
-<!--基準点1-->
-    <View
+<!--基準点1(harfripe)-->
+    <TextView
         android:id="@+id/color_box_harf"
         android:layout_width="414dp"
         android:layout_height="151dp"
         android:layout_centerInParent="true"
-        android:layout_gravity="center"
+        android:gravity="center"
+        android:text="harf ripe"
+        android:textSize="80dp"
+        android:textColor="@color/black"
         android:background="@drawable/colored_box"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
@@ -77,13 +80,16 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.0" />
 
-<!--基準点２-->
-    <View
+<!--基準点２(ripe)-->
+    <TextView
         android:id="@+id/color_box_ripe"
         android:layout_width="414dp"
         android:layout_height="151dp"
         android:layout_centerInParent="true"
-        android:layout_gravity="center"
+        android:gravity="center"
+        android:text="ripe"
+        android:textSize="80dp"
+        android:textColor="@color/black"
         android:background="#FFFFFF"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
@@ -91,6 +97,43 @@
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.0"  />
+
+    <!--基準点２(over_ripe)-->
+    <TextView
+        android:id="@+id/color_box_overripe_text"
+        android:layout_width="414dp"
+        android:layout_height="151dp"
+        android:layout_centerInParent="true"
+        android:text="OverRipe"
+        android:textColor="@color/black"
+        android:background="#FF0000"
+        android:textSize="80dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.0"
+        android:gravity="center"/>
+
+    <!--説明文-->
+    <TextView
+        android:id="@+id/introduction_text"
+        android:layout_width="414dp"
+        android:layout_height="151dp"
+        android:layout_centerInParent="true"
+        android:text="いちごを枠内に入れてください"
+        android:textColor="@color/black"
+        android:background="#FFFFFF"
+        android:textSize="40dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.0"
+        android:gravity="center"/>
+
 
 
 

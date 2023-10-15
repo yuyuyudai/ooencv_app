@@ -32,8 +32,10 @@ public class MainActivity extends CameraActivity implements CameraBridgeViewBase
 
 
     public TextView pixelCountTextView;
-    public View coloredBox_harf;
-    public View coloredBox_ripe;
+    public TextView coloredText_overripe;
+    public TextView coloredBox_harf;
+    public TextView coloredBox_ripe;
+    public TextView introduct;
 
     private CameraBridgeViewBase mOpenCvCameraView;
     private boolean              mIsJavaCamera = true;
@@ -75,8 +77,10 @@ public class MainActivity extends CameraActivity implements CameraBridgeViewBase
 
 
         pixelCountTextView = (TextView)findViewById(R.id.pixelsInMask1str);
+        coloredText_overripe = findViewById(R.id.color_box_overripe_text);
         coloredBox_harf = findViewById(R.id.color_box_harf);
         coloredBox_ripe = findViewById(R.id.color_box_ripe);
+        introduct = findViewById(R.id.introduction_text);
 
         mOpenCvCameraView = (CameraBridgeViewBase) findViewById(R.id.camera_view);
 
@@ -277,12 +281,26 @@ public class MainActivity extends CameraActivity implements CameraBridgeViewBase
             public void run() {
                 pixelCountTextView.setText(String.valueOf(ripe_ratio)+"%");
 
-                if (ratio > 10) {
-                    coloredBox_harf.setVisibility(View.VISIBLE); // 表示
+                if (ratio < 40 ) {//熟度が40%未満ならば説明文を表示
+                    introduct.setVisibility(View.VISIBLE);
+                    coloredBox_harf.setVisibility(View.GONE);
                     coloredBox_ripe.setVisibility(View.GONE);
-                } else {
-                    coloredBox_harf.setVisibility(View.GONE); // 非表示
+                    coloredText_overripe.setVisibility(View.GONE);
+                } else if (ratio >= 40 && ratio < 65) {//40～65はharf_ripeを表示
+                    introduct.setVisibility(View.GONE);
+                    coloredBox_harf.setVisibility(View.VISIBLE);
+                    coloredBox_ripe.setVisibility(View.GONE);
+                    coloredText_overripe.setVisibility(View.GONE);
+                } else if (ratio >= 65 && ratio < 85){//65～85はripeを表示
+                    introduct.setVisibility(View.GONE);
+                    coloredBox_harf.setVisibility(View.GONE);
                     coloredBox_ripe.setVisibility(View.VISIBLE);
+                    coloredText_overripe.setVisibility(View.GONE);
+                }else{//85以上はover_ripeを表示
+                    introduct.setVisibility(View.GONE);
+                    coloredBox_harf.setVisibility(View.GONE);
+                    coloredBox_ripe.setVisibility(View.GONE);
+                    coloredText_overripe.setVisibility(View.VISIBLE);
                 }
             }
 
