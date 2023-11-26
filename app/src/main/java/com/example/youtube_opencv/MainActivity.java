@@ -184,13 +184,14 @@ public class MainActivity extends CameraActivity implements CameraBridgeViewBase
 
         int startX = centerX - halfWidth / 2;
         int startY = centerY - halfHeight / 2;
-        Rect cropRect = new Rect(startX, startY, halfWidth,halfHeight );  // トリミングする領域を定義
+        Rect cropRect = new Rect(startX, startY-50, halfWidth,halfHeight );  // トリミングする領域を定義
         Size newSize = new Size(inputImage.width(),inputImage.height()); // 出力サイズを定義
 
         // 入力画像をトリミングおよびリサイズ
         Mat croppedResizedImage = new Mat();
         //Mat inputImage = inputFrame.rgba();  // inputFrame に元の画像が含まれていると仮定
         Mat croppedImage = new Mat(inputImage, cropRect);  // 画像をトリミング
+        //リサイズせずにトリミング画像で画像処理を行ったほうが良い？
         Imgproc.resize(croppedImage, croppedResizedImage, newSize);  // トリミングした画像をリサイズ
 
         // これで croppedResizedImage 上でさらなる処理を実行できます
@@ -202,74 +203,80 @@ public class MainActivity extends CameraActivity implements CameraBridgeViewBase
         Mat hueChannel = new Mat(); // 色相チャンネル画像を格納
         Mat binaryImage = new Mat(); // 二値化画像を格納
         Mat combineImage = new Mat();
+        Mat median = new Mat();
+        Mat maskRed = new Mat();
+        Mat maskStrawberry = new Mat();
 
+        //croppedResizeImageの場合------
+        //croppedResizeImageをメディアンフィルタをかける
+        Imgproc.medianBlur(croppedResizedImage, median, 7); // フィルタのカーネルサイズを調整可能
         // RGBからHSVに変換
-        Imgproc.cvtColor(croppedResizedImage, hsvImage, Imgproc.COLOR_RGB2HSV);
+        Imgproc.cvtColor(median, hsvImage, Imgproc.COLOR_RGB2HSV);
+
+        //croppedImageの場合-------
+        //croppedImageをメディアンフィルタをかける
+        //Imgproc.medianBlur(croppedImage, median, 7); // フィルタのカーネルサイズを調整可能
+        // RGBからHSVに変換
+        //Imgproc.cvtColor(median, hsvImage, Imgproc.COLOR_RGB2HSV);
+
+        //メディアンフィルタを使わずRGB→HSV
+        //Imgproc.cvtColor(croppedResizedImage, hsvImage, Imgproc.COLOR_RGB2HSV);
 
         // 色相チャンネルを抽出
         List<Mat> channels = new ArrayList<>();
         Core.split(hsvImage, channels);
         hueChannel = channels.get(0);
 
-        // 濃い赤色の抽出(Hueが0付近)
-        Scalar dr_lowerBound = new Scalar(0, 50, 0);
-        Scalar dr_upperBound = new Scalar(1, 255, 155);
-        Core.inRange(hsvImage, dr_lowerBound, dr_upperBound, binaryImage);
-        //Core.bitwise_or(binaryImage, combineImage, binaryImage);
 
-        /*// 濃い赤色の抽出(Hueが179付近)
-        Scalar high_dr_lowerBound = new Scalar(178,50,0);
-        Scalar high_dr_upperBound = new Scalar(179,255,255);
+        // 赤色の抽出(Hueが0付近)
+        Mat maskRed_0 = new Mat();
+        Scalar dr_lowerBound = new Scalar(0, 127, 108);
+        Scalar dr_upperBound = new Scalar(11, 251, 255);
+        Core.inRange(hsvImage, dr_lowerBound, dr_upperBound, maskRed_0);
 
-        Core.inRange(hsvImage, high_dr_lowerBound, high_dr_upperBound, combineImage);
-        Core.bitwise_or(binaryImage, combineImage, binaryImage);*/
+        // 赤色の抽出(Hueが179付近)
+        Mat maskRed_180 = new Mat();
+        Scalar high_dr_lowerBound = new Scalar(178,127,108);
+        Scalar high_dr_upperBound = new Scalar(179,251,255);
+        Core.inRange(hsvImage, high_dr_lowerBound, high_dr_upperBound, maskRed_180);
 
-        //赤の条件厳しく(大)
-        //double red = Core.countNonZero(binaryImage);
-
-
-        // 赤色の抽出
-        Scalar r_lowerBound = new Scalar(2, 50, 50);
-        Scalar r_upperBound = new Scalar(25, 255, 255);
-        Core.inRange(hsvImage, r_lowerBound, r_upperBound, combineImage);
-        Core.bitwise_or(binaryImage, combineImage, binaryImage);
-
-        /*//赤色の抽出（Hueが179付近）
-        Scalar high_r_lowerBound = new Scalar(2, 50, 50);
-        Scalar high_r_upperBound = new Scalar(25, 255, 255);
-        Core.inRange(hsvImage, high_r_lowerBound, high_r_upperBound, combineImage);
-
-        Core.bitwise_or(binaryImage, combineImage, binaryImage);
-*/
-        //赤の条件厳しく(中)
-        double red = Core.countNonZero(binaryImage);
-
-
-        // オレンジ色の抽出
-        Scalar o_lowerBound = new Scalar(11, 0, 0);
-        Scalar o_upperBound = new Scalar(25, 255, 255);
-        Core.inRange(hsvImage, o_lowerBound, o_upperBound, combineImage);
-
-        Core.bitwise_or(binaryImage, combineImage, binaryImage);
-
-        //赤の条件（ゆるく）
-        //double red = Core.countNonZero(binaryImage);
+        //maskRed_0とmaskRed_180を合わせてmaskRedを作成
+        Core.bitwise_or(maskRed_0, maskRed_180,maskRed);
 
 
         // 緑色の抽出
-        Scalar gr_lowerBound = new Scalar(26, 30, 50);
-        Scalar gr_upperBound = new Scalar(48, 255, 255);
-        Core.inRange(hsvImage, gr_lowerBound, gr_upperBound, combineImage);
+        Mat maskGreen = new Mat();
+        Scalar gr_lowerBound = new Scalar(11, 11, 84);
+        Scalar gr_upperBound = new Scalar(43, 199, 239);
+        Core.inRange(hsvImage, gr_lowerBound, gr_upperBound, maskGreen);
 
-        Core.bitwise_or(binaryImage, combineImage, binaryImage);
+        //maskRedとmaskGreenをあわせてmaskStrawberryを作成
+        Core.bitwise_or(maskRed, maskGreen, maskStrawberry);
 
 
-        double all = Core.countNonZero(binaryImage) + 0.1;
+        //maskRedのピクセル計算
+        double red = Core.countNonZero(maskRed);
+        //maskStrawberryのピクセル計算
+        double all = Core.countNonZero(maskStrawberry) + 0.1;
 
+
+        // maskRedの二値化画像をもとのRGB画像と合成
+        Mat redImage = new Mat();
+
+        //croppedResizeImageの場合------
+        croppedResizedImage.copyTo(redImage, maskRed);
+
+        //croppedImageの場合------
+        //croppedImage.copyTo(redImage, binaryImage);
 
         // 二値化画像をもとのRGB画像と合成
         Mat resultImage = new Mat();
-        croppedResizedImage.copyTo(resultImage, binaryImage);
+
+        //croppedResizeImageの場合------
+        croppedResizedImage.copyTo(resultImage, maskStrawberry);
+
+        //croppedImageの場合------
+        //croppedImage.copyTo(resultImage, binaryImage);
 
         //TextView text = (TextView) findViewById(R.id.pixelsInMask1str);
 
