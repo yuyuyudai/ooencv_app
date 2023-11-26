@@ -18,6 +18,7 @@ import org.opencv.android.OpenCVLoader;
 import org.opencv.core.Core;
 import org.opencv.core.CvType;
 import org.opencv.core.Mat;
+import org.opencv.core.MatOfPoint;
 import org.opencv.core.Rect;
 import org.opencv.core.Scalar;
 import org.opencv.core.Size;
@@ -189,7 +190,6 @@ public class MainActivity extends CameraActivity implements CameraBridgeViewBase
 
         // 入力画像をトリミングおよびリサイズ
         Mat croppedResizedImage = new Mat();
-        //Mat inputImage = inputFrame.rgba();  // inputFrame に元の画像が含まれていると仮定
         Mat croppedImage = new Mat(inputImage, cropRect);  // 画像をトリミング
         //リサイズせずにトリミング画像で画像処理を行ったほうが良い？
         Imgproc.resize(croppedImage, croppedResizedImage, newSize);  // トリミングした画像をリサイズ
@@ -213,7 +213,7 @@ public class MainActivity extends CameraActivity implements CameraBridgeViewBase
         // RGBからHSVに変換
         Imgproc.cvtColor(median, hsvImage, Imgproc.COLOR_RGB2HSV);
 
-        //croppedImageの場合-------
+        //croppedImageの場合-------動作しないというエラーが発生する
         //croppedImageをメディアンフィルタをかける
         //Imgproc.medianBlur(croppedImage, median, 7); // フィルタのカーネルサイズを調整可能
         // RGBからHSVに変換
@@ -247,17 +247,53 @@ public class MainActivity extends CameraActivity implements CameraBridgeViewBase
         // 緑色の抽出
         Mat maskGreen = new Mat();
         Scalar gr_lowerBound = new Scalar(11, 11, 84);
-        Scalar gr_upperBound = new Scalar(43, 199, 239);
+        Scalar gr_upperBound = new Scalar(45, 199, 239);
         Core.inRange(hsvImage, gr_lowerBound, gr_upperBound, maskGreen);
 
         //maskRedとmaskGreenをあわせてmaskStrawberryを作成
         Core.bitwise_or(maskRed, maskGreen, maskStrawberry);
 
+        // モルフォロジー変換
+        Mat kernel = Imgproc.getStructuringElement(Imgproc.MORPH_RECT, new Size(5, 5));
+        Imgproc.morphologyEx(maskStrawberry, maskStrawberry, Imgproc.MORPH_OPEN, kernel);
+        Imgproc.morphologyEx(maskRed, maskRed, Imgproc.MORPH_OPEN, kernel);
+
+        // 輪郭抽出とフィルタリング
+        List<MatOfPoint> contoursStrawberry = new ArrayList<>();
+        List<MatOfPoint> contoursRed = new ArrayList<>();
+
+        Imgproc.findContours(maskStrawberry, contoursStrawberry, new Mat(), Imgproc.RETR_EXTERNAL, Imgproc.CHAIN_APPROX_SIMPLE);
+        Imgproc.findContours(maskRed, contoursRed, new Mat(), Imgproc.RETR_EXTERNAL, Imgproc.CHAIN_APPROX_SIMPLE);
+
+        List<MatOfPoint> filteredContoursStrawberry = new ArrayList<>();
+        List<MatOfPoint> filteredContoursRed = new ArrayList<>();
+
+        for (MatOfPoint contour : contoursStrawberry) {
+            double area = Imgproc.contourArea(contour);
+            if (area > 50000) {
+                filteredContoursStrawberry.add(contour);
+            }
+        }
+
+        for (MatOfPoint contour : contoursRed) {
+            double area = Imgproc.contourArea(contour);
+            if (area > 50000) {
+                filteredContoursRed.add(contour);
+            }
+        }
+
+        // フィルタリングされた輪郭を描画
+        Mat resultStrawberry = Mat.zeros(maskStrawberry.size(), CvType.CV_8U);
+        Mat resultRed = Mat.zeros(maskRed.size(), CvType.CV_8U);
+
+        Imgproc.drawContours(resultStrawberry, filteredContoursStrawberry, -1, new Scalar(255), Core.FILLED);
+        Imgproc.drawContours(resultRed, filteredContoursRed, -1, new Scalar(255), Core.FILLED);
+
 
         //maskRedのピクセル計算
-        double red = Core.countNonZero(maskRed);
+        double red = Core.countNonZero(resultRed);
         //maskStrawberryのピクセル計算
-        double all = Core.countNonZero(maskStrawberry) + 0.1;
+        double all = Core.countNonZero(resultStrawberry) + 0.1;
 
 
         // maskRedの二値化画像をもとのRGB画像と合成
