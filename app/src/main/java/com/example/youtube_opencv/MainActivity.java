@@ -35,6 +35,7 @@ public class MainActivity extends CameraActivity implements CameraBridgeViewBase
 
 
     public TextView pixelCountTextView;
+    public TextView predictTextView;
     public TextView coloredText_overripe;
     public TextView coloredBox_harf;
     public TextView coloredBox_ripe;
@@ -82,6 +83,7 @@ public class MainActivity extends CameraActivity implements CameraBridgeViewBase
         //((Vibrator) getSystemService(Context.VIBRATOR_SERVICE)).vibrate(1000);
 
         pixelCountTextView = (TextView)findViewById(R.id.pixelsInMask1str);
+        predictTextView = (TextView)findViewById(R.id.predict);
         coloredText_overripe = findViewById(R.id.color_box_overripe_text);
         coloredBox_harf = findViewById(R.id.color_box_harf);
         coloredBox_ripe = findViewById(R.id.color_box_ripe);
@@ -228,16 +230,19 @@ public class MainActivity extends CameraActivity implements CameraBridgeViewBase
         hueChannel = channels.get(0);
 
 
+
+
+
         // 赤色の抽出(Hueが0付近)
         Mat maskRed_0 = new Mat();
-        Scalar dr_lowerBound = new Scalar(0, 127, 108);
-        Scalar dr_upperBound = new Scalar(11, 251, 255);
+        Scalar dr_lowerBound = new Scalar(0, 127, 108);//(0, 127, 108)
+        Scalar dr_upperBound = new Scalar(15, 251,255);//(11, 251, 255)
         Core.inRange(hsvImage, dr_lowerBound, dr_upperBound, maskRed_0);
 
         // 赤色の抽出(Hueが179付近)
         Mat maskRed_180 = new Mat();
-        Scalar high_dr_lowerBound = new Scalar(178,127,108);
-        Scalar high_dr_upperBound = new Scalar(179,251,255);
+        Scalar high_dr_lowerBound = new Scalar(177,127,108);//(178,127,108
+        Scalar high_dr_upperBound = new Scalar(180,251,255);//(179,251,255
         Core.inRange(hsvImage, high_dr_lowerBound, high_dr_upperBound, maskRed_180);
 
         //maskRed_0とmaskRed_180を合わせてmaskRedを作成
@@ -246,8 +251,8 @@ public class MainActivity extends CameraActivity implements CameraBridgeViewBase
 
         // 緑色の抽出
         Mat maskGreen = new Mat();
-        Scalar gr_lowerBound = new Scalar(11, 11, 84);
-        Scalar gr_upperBound = new Scalar(45, 199, 239);
+        Scalar gr_lowerBound = new Scalar(16, 11, 84);//(11, 11, 84)
+        Scalar gr_upperBound = new Scalar(50, 255, 255);//(45, 199, 239)
         Core.inRange(hsvImage, gr_lowerBound, gr_upperBound, maskGreen);
 
         //maskRedとmaskGreenをあわせてmaskStrawberryを作成
@@ -270,14 +275,14 @@ public class MainActivity extends CameraActivity implements CameraBridgeViewBase
 
         for (MatOfPoint contour : contoursStrawberry) {
             double area = Imgproc.contourArea(contour);
-            if (area > 50000) {
+            if (area > 30000) {
                 filteredContoursStrawberry.add(contour);
             }
         }
 
         for (MatOfPoint contour : contoursRed) {
             double area = Imgproc.contourArea(contour);
-            if (area > 50000) {
+            if (area > 30000) {
                 filteredContoursRed.add(contour);
             }
         }
@@ -289,27 +294,50 @@ public class MainActivity extends CameraActivity implements CameraBridgeViewBase
         Imgproc.drawContours(resultStrawberry, filteredContoursStrawberry, -1, new Scalar(255), Core.FILLED);
         Imgproc.drawContours(resultRed, filteredContoursRed, -1, new Scalar(255), Core.FILLED);
 
+        //maskStrawberryのピクセル計算
+        double all = Core.countNonZero(resultStrawberry) + 0.1;
+
+        /*Mat resultImage = new Mat();
+
+        // resultStrawberryの二値化画像をもとのRGB画像と合成
+        Mat resultStrawberry_hsv = new Mat();
+        Imgproc.cvtColor(resultStrawberry, resultImage, Imgproc.COLOR_GRAY2BGR);
+        //resultStrawberryのhsv画像を作成
+        Imgproc.cvtColor(resultStrawberry_hsv, resultStrawberry_hsv, Imgproc.COLOR_BGR2HSV);
+
+
+        // フィルタリング画像の赤のマスク
+        Mat mask_filter_Red = new Mat();
+        // フィルタリング画像からイチゴを抽出(Hueが0付近)
+        Mat mask_filter_Red_0 = new Mat();
+        Core.inRange(resultStrawberry_hsv, dr_lowerBound, dr_upperBound, mask_filter_Red_0);
+
+        // 赤色の抽出(Hueが179付近)
+        Mat mask_filter_Red_180 = new Mat();
+        Core.inRange(resultStrawberry_hsv, high_dr_lowerBound, high_dr_upperBound, mask_filter_Red_180);
+
+        //maskRed_0とmaskRed_180を合わせてmaskRedを作成
+        Core.bitwise_or(mask_filter_Red_0, mask_filter_Red_180,mask_filter_Red);
+
+*/
+
 
         //maskRedのピクセル計算
         double red = Core.countNonZero(resultRed);
         //maskStrawberryのピクセル計算
-        double all = Core.countNonZero(resultStrawberry) + 0.1;
+        //double all = Core.countNonZero(resultStrawberry) + 0.1;
 
 
         // maskRedの二値化画像をもとのRGB画像と合成
         Mat redImage = new Mat();
 
         //croppedResizeImageの場合------
-        croppedResizedImage.copyTo(redImage, maskRed);
+        croppedResizedImage.copyTo(redImage, resultStrawberry);
 
         //croppedImageの場合------
         //croppedImage.copyTo(redImage, binaryImage);
 
-        // 二値化画像をもとのRGB画像と合成
-        Mat resultImage = new Mat();
 
-        //croppedResizeImageの場合------
-        croppedResizedImage.copyTo(resultImage, maskStrawberry);
 
         //croppedImageの場合------
         //croppedImage.copyTo(resultImage, binaryImage);
@@ -323,14 +351,29 @@ public class MainActivity extends CameraActivity implements CameraBridgeViewBase
         BigDecimal ripe_ratio = bd.setScale(2,BigDecimal.ROUND_HALF_UP);
 
 
+        double predict_time_80 = (80-18.213) / 0.0217;
+
+        double predict_time = (ratio-18.213) / 0.0217;
+
+        int predict_time_int =(int)(predict_time_80-predict_time);
+
+        int predict_time_hour = predict_time_int / 60;
+
+        int predict_time_minutes = predict_time_int % 60;
 
 
 
-        runOnUiThread(new Runnable(){
 
-            @Override
+
+
+
+            runOnUiThread(new Runnable(){
+
+                @Override
             public void run() {
                 pixelCountTextView.setText(String.valueOf(ripe_ratio)+"%");
+
+                predictTextView.setText(String.valueOf(predict_time_hour)+"時間後");
 
                 if (ratio < 40 ) {//熟度が40%未満ならば説明文を表示
 

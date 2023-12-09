@@ -61,7 +61,23 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.742" />
 
-<!--基準点1(harfripe)-->
+
+
+    <TextView
+        android:id="@+id/predict"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="#77FFFFFF"
+        android:text="pixel Count"
+        android:textColor="@color/black"
+        android:textSize="80dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.912" />
+
+    <!--基準点1(harfripe)-->
     <TextView
         android:id="@+id/color_box_harf"
         android:layout_width="414dp"
