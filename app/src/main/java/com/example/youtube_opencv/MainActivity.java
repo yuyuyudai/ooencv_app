@@ -211,7 +211,7 @@ public class MainActivity extends CameraActivity implements CameraBridgeViewBase
 
         //croppedResizeImageの場合------
         //croppedResizeImageをメディアンフィルタをかける
-        Imgproc.medianBlur(croppedResizedImage, median, 7); // フィルタのカーネルサイズを調整可能
+        Imgproc.medianBlur(croppedResizedImage, median, 1); // フィルタのカーネルサイズを調整可能
         // RGBからHSVに変換
         Imgproc.cvtColor(median, hsvImage, Imgproc.COLOR_RGB2HSV);
 
@@ -259,7 +259,7 @@ public class MainActivity extends CameraActivity implements CameraBridgeViewBase
         Core.bitwise_or(maskRed, maskGreen, maskStrawberry);
 
         // モルフォロジー変換
-        Mat kernel = Imgproc.getStructuringElement(Imgproc.MORPH_RECT, new Size(5, 5));
+        Mat kernel = Imgproc.getStructuringElement(Imgproc.MORPH_RECT, new Size(3, 3));
         Imgproc.morphologyEx(maskStrawberry, maskStrawberry, Imgproc.MORPH_OPEN, kernel);
         Imgproc.morphologyEx(maskRed, maskRed, Imgproc.MORPH_OPEN, kernel);
 
@@ -332,7 +332,7 @@ public class MainActivity extends CameraActivity implements CameraBridgeViewBase
         Mat redImage = new Mat();
 
         //croppedResizeImageの場合------
-        croppedResizedImage.copyTo(redImage, resultStrawberry);
+        croppedResizedImage.copyTo(redImage,maskGreen );
 
         //croppedImageの場合------
         //croppedImage.copyTo(redImage, binaryImage);
@@ -355,11 +355,11 @@ public class MainActivity extends CameraActivity implements CameraBridgeViewBase
 
         double predict_time = (ratio-18.213) / 0.0217;
 
-        int predict_time_int =(int)(predict_time_80-predict_time);
+        int predict_time_dif =(int)(predict_time_80-predict_time);
 
-        int predict_time_hour = predict_time_int / 60;
+        int predict_time_hour = predict_time_dif / 60;
 
-        int predict_time_minutes = predict_time_int % 60;
+        int predict_time_minutes = predict_time_dif % 60;
 
 
 
@@ -373,7 +373,16 @@ public class MainActivity extends CameraActivity implements CameraBridgeViewBase
             public void run() {
                 pixelCountTextView.setText(String.valueOf(ripe_ratio)+"%");
 
-                predictTextView.setText(String.valueOf(predict_time_hour)+"時間後");
+
+                if (predict_time_dif > 0){
+                    predictTextView.setText(String.valueOf(predict_time_hour)+"時間"+String.valueOf(predict_time_minutes)+"分後");
+                }
+                else{
+                    predictTextView.setText("収穫可能");
+                }
+
+
+
 
                 if (ratio < 40 ) {//熟度が40%未満ならば説明文を表示
 
