@@ -137,7 +137,7 @@
         android:layout_width="414dp"
         android:layout_height="151dp"
         android:layout_centerInParent="true"
-        android:text="いちごを枠内に入れてください"
+        android:text="判定するいちご全体を枠内に入れてください"
         android:textColor="@color/black"
         android:background="#FFFFFF"
         android:textSize="40dp"

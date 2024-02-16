@@ -351,9 +351,9 @@ public class MainActivity extends CameraActivity implements CameraBridgeViewBase
         BigDecimal ripe_ratio = bd.setScale(2,BigDecimal.ROUND_HALF_UP);
 
 
-        double predict_time_80 = (80-18.213) / 0.0217;
+        double predict_time_80 = 80.0 / 0.0199;
 
-        double predict_time = (ratio-18.213) / 0.0217;
+        double predict_time = ratio / 0.0199;
 
         int predict_time_dif =(int)(predict_time_80-predict_time);
 
@@ -374,33 +374,39 @@ public class MainActivity extends CameraActivity implements CameraBridgeViewBase
                 pixelCountTextView.setText(String.valueOf(ripe_ratio)+"%");
 
 
-                if (predict_time_dif > 0){
-                    predictTextView.setText(String.valueOf(predict_time_hour)+"時間"+String.valueOf(predict_time_minutes)+"分後");
-                }
-                else{
-                    predictTextView.setText("収穫可能");
-                }
+                    if(predict_time_dif > 0 && ratio == 0){
+                        predictTextView.setText(String.valueOf(""));
+
+                    }
+                    else if (predict_time_dif > 0 && ratio != 0){
+                        predictTextView.setText(String.valueOf(predict_time_hour)+"時間"+String.valueOf(predict_time_minutes)+"分後");
+                    }
+                    else{
+                        predictTextView.setText("収穫可能");
+                    }
 
 
 
 
-                if (ratio < 40 ) {//熟度が40%未満ならば説明文を表示
+
+                    if (ratio < 30 ) {//熟度が40%未満ならば説明文を表示
 
                     introduct.setVisibility(View.VISIBLE);
                     coloredBox_harf.setVisibility(View.GONE);
                     coloredBox_ripe.setVisibility(View.GONE);
                     coloredText_overripe.setVisibility(View.GONE);
-                } else if (ratio >= 40 && ratio < 65) {//40～65はharf_ripeを表示
+                } else if (ratio >= 30 && ratio < 60) {//40～65はharf_ripeを表示
                     introduct.setVisibility(View.GONE);
                     coloredBox_harf.setVisibility(View.VISIBLE);
                     coloredBox_ripe.setVisibility(View.GONE);
                     coloredText_overripe.setVisibility(View.GONE);
-                } else if (ratio >= 65 && ratio < 85){//65～85はripeを表示
+                } else if (ratio >= 60 && ratio < 80){//65～85はripeを表示
                     introduct.setVisibility(View.GONE);
                     coloredBox_harf.setVisibility(View.GONE);
                     coloredBox_ripe.setVisibility(View.VISIBLE);
                     coloredText_overripe.setVisibility(View.GONE);
-                }else{//85以上はover_ripeを表示
+                }
+                else{//85以上はover_ripeを表示
                     introduct.setVisibility(View.GONE);
                     coloredBox_harf.setVisibility(View.GONE);
                     coloredBox_ripe.setVisibility(View.GONE);
@@ -424,7 +430,7 @@ public class MainActivity extends CameraActivity implements CameraBridgeViewBase
 
         // 画像を表示////
         return inputImage;
-        //return croppedResizedImage;
+        //return redImage;
 
 
     }
