@@ -326,7 +326,7 @@ public class MainActivity extends CameraActivity implements CameraBridgeViewBase
             double circularity = calculateCircularity(contour);
 
             if (circularity > circularityThreshold) {
-                if(area > 30000){
+                if(area > 3000){
                     filteredContoursStrawberry_area.add(contour);
                     drawBoundingRect(croppedResizedImage,contour);
                     flag=true;
@@ -347,7 +347,7 @@ public class MainActivity extends CameraActivity implements CameraBridgeViewBase
 
         for (MatOfPoint contour : contoursRed) {
             double area = Imgproc.contourArea(contour);
-            if (area > 30000) {
+            if (area > 3000) {
                 filteredContoursRed.add(contour);
             }
         }
