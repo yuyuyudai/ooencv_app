@@ -78,7 +78,6 @@ public class MainActivity extends CameraActivity implements CameraBridgeViewBase
     public void drawBoundingRect(Mat image, MatOfPoint contour) {
         // 輪郭を囲む矩形領域を取得
         Rect rect = Imgproc.boundingRect(contour);
-
         // 矩形を描画
         Imgproc.rectangle(image, rect.tl(), rect.br(), new Scalar(0, 255, 0), 2);
     }
@@ -253,14 +252,7 @@ public class MainActivity extends CameraActivity implements CameraBridgeViewBase
         // RGBからHSVに変換
         Imgproc.cvtColor(median, hsvImage, Imgproc.COLOR_RGB2HSV);
 
-        //croppedImageの場合-------動作しないというエラーが発生する
-        //croppedImageをメディアンフィルタをかける
-        //Imgproc.medianBlur(croppedImage, median, 7); // フィルタのカーネルサイズを調整可能
-        // RGBからHSVに変換
-        //Imgproc.cvtColor(median, hsvImage, Imgproc.COLOR_RGB2HSV);
 
-        //メディアンフィルタを使わずRGB→HSV
-        //Imgproc.cvtColor(croppedResizedImage, hsvImage, Imgproc.COLOR_RGB2HSV);
 
         // 色相チャンネルを抽出
         List<Mat> channels = new ArrayList<>();
@@ -336,7 +328,7 @@ public class MainActivity extends CameraActivity implements CameraBridgeViewBase
             if (circularity > circularityThreshold) {
                 if(area > 30000){
                     filteredContoursStrawberry_area.add(contour);
-                    drawBoundingRect(inputImage,contour);
+                    drawBoundingRect(croppedResizedImage,contour);
                     flag=true;
                 }
 
@@ -348,7 +340,7 @@ public class MainActivity extends CameraActivity implements CameraBridgeViewBase
         double all=0.0;
         double red = 0.0;
         if(!flag){
-            return inputImage;
+            return croppedResizedImage;
         }
 
 
@@ -482,7 +474,7 @@ public class MainActivity extends CameraActivity implements CameraBridgeViewBase
 
 
         // 画像を表示////
-        return inputImage;
+        return croppedResizedImage;
         //return StrawberryImage;
 
 
