@@ -19,6 +19,8 @@ import org.opencv.core.Core;
 import org.opencv.core.CvType;
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfPoint;
+import org.opencv.core.MatOfPoint2f;
+import org.opencv.core.Point;
 import org.opencv.core.Rect;
 import org.opencv.core.Scalar;
 import org.opencv.core.Size;
@@ -44,6 +46,42 @@ public class MainActivity extends CameraActivity implements CameraBridgeViewBase
     private CameraBridgeViewBase mOpenCvCameraView;
     private boolean              mIsJavaCamera = true;
     private MenuItem             mItemSwitchCamera = null;
+
+    // 円形度を計算するメソッド
+    private double calculateCircularity(MatOfPoint contour) {
+        // 輪郭の面積
+        double area = Imgproc.contourArea(contour);
+        // 輪郭の外接円
+        Point center = new Point();
+        float[] radius = new float[1];
+        Imgproc.minEnclosingCircle(new MatOfPoint2f(contour.toArray()), center, radius);
+        // 外接円の面積
+        double circleArea = Math.PI * radius[0] * radius[0];
+        // 円形度を計算
+        return area / circleArea;
+    }
+
+    // 円形度を使用してフィルタリングするメソッド
+    private List<MatOfPoint> filterContoursByCircularity(List<MatOfPoint> contours, double circularityThreshold) {
+        List<MatOfPoint> filteredContours = new ArrayList<>();
+        for (MatOfPoint contour : contours) {
+            double circularity = calculateCircularity(contour);
+            if (circularity > circularityThreshold) {
+                filteredContours.add(contour);
+            }
+        }
+        return filteredContours;
+    }
+
+
+    // いちごの二値化画像に対していちごを囲む矩形領域を見つけて描画するメソッド
+    public void drawBoundingRect(Mat image, MatOfPoint contour) {
+        // 輪郭を囲む矩形領域を取得
+        Rect rect = Imgproc.boundingRect(contour);
+
+        // 矩形を描画
+        Imgproc.rectangle(image, rect.tl(), rect.br(), new Scalar(0, 255, 0), 2);
+    }
 
     private BaseLoaderCallback mLoaderCallback = new BaseLoaderCallback(this) {
         @Override
@@ -233,30 +271,44 @@ public class MainActivity extends CameraActivity implements CameraBridgeViewBase
 
 
 
-        // 赤色の抽出(Hueが0付近)
+        // 赤色の抽出(Hueが0付近)(本物イチゴ用)
         Mat maskRed_0 = new Mat();
         Scalar dr_lowerBound = new Scalar(0, 127, 108);//(0, 127, 108)
         Scalar dr_upperBound = new Scalar(15, 251,255);//(11, 251, 255)
         Core.inRange(hsvImage, dr_lowerBound, dr_upperBound, maskRed_0);
 
+//        // 赤色の抽出(Hueが0付近)(レプリカイチゴ用)
+//        Mat maskRed_0 = new Mat();
+//        Scalar dr_lowerBound = new Scalar(0, 127, 108);//(0, 127, 108)
+//        Scalar dr_upperBound = new Scalar(14, 251,255);//(11, 251, 255)
+//        Core.inRange(hsvImage, dr_lowerBound, dr_upperBound, maskRed_0);
+
+
         // 赤色の抽出(Hueが179付近)
         Mat maskRed_180 = new Mat();
         Scalar high_dr_lowerBound = new Scalar(177,127,108);//(178,127,108
-        Scalar high_dr_upperBound = new Scalar(180,251,255);//(179,251,255
+        Scalar high_dr_upperBound = new Scalar(179,251,255);//(179,251,255
         Core.inRange(hsvImage, high_dr_lowerBound, high_dr_upperBound, maskRed_180);
 
         //maskRed_0とmaskRed_180を合わせてmaskRedを作成
         Core.bitwise_or(maskRed_0, maskRed_180,maskRed);
 
 
-        // 緑色の抽出
+        // 緑色の抽出(本物のイチゴ用)
         Mat maskGreen = new Mat();
         Scalar gr_lowerBound = new Scalar(16, 11, 84);//(11, 11, 84)
         Scalar gr_upperBound = new Scalar(50, 255, 255);//(45, 199, 239)
         Core.inRange(hsvImage, gr_lowerBound, gr_upperBound, maskGreen);
 
+//        Mat maskGreen = new Mat();//(レプリカイチゴ用)
+//        Scalar gr_lowerBound = new Scalar(14, 11, 84);//(11, 11, 84)
+//        Scalar gr_upperBound = new Scalar(60, 255, 255);//(45, 199, 239)
+//        Core.inRange(hsvImage, gr_lowerBound, gr_upperBound, maskGreen);
+
         //maskRedとmaskGreenをあわせてmaskStrawberryを作成
         Core.bitwise_or(maskRed, maskGreen, maskStrawberry);
+
+
 
         // モルフォロジー変換
         Mat kernel = Imgproc.getStructuringElement(Imgproc.MORPH_RECT, new Size(3, 3));
@@ -270,15 +322,36 @@ public class MainActivity extends CameraActivity implements CameraBridgeViewBase
         Imgproc.findContours(maskStrawberry, contoursStrawberry, new Mat(), Imgproc.RETR_EXTERNAL, Imgproc.CHAIN_APPROX_SIMPLE);
         Imgproc.findContours(maskRed, contoursRed, new Mat(), Imgproc.RETR_EXTERNAL, Imgproc.CHAIN_APPROX_SIMPLE);
 
-        List<MatOfPoint> filteredContoursStrawberry = new ArrayList<>();
+        List<MatOfPoint> filteredContoursStrawberry_area = new ArrayList<>();
         List<MatOfPoint> filteredContoursRed = new ArrayList<>();
+
+        // 円形度のしきい値
+        double circularityThreshold = 0.4;
+        boolean flag=false;
 
         for (MatOfPoint contour : contoursStrawberry) {
             double area = Imgproc.contourArea(contour);
-            if (area > 30000) {
-                filteredContoursStrawberry.add(contour);
+            double circularity = calculateCircularity(contour);
+
+            if (circularity > circularityThreshold) {
+                if(area > 30000){
+                    filteredContoursStrawberry_area.add(contour);
+                    drawBoundingRect(inputImage,contour);
+                    flag=true;
+                }
+
             }
         }
+
+
+        //条件クリアするイチゴが見つからなかったとき
+        double all=0.0;
+        double red = 0.0;
+        if(!flag){
+            return inputImage;
+        }
+
+
 
         for (MatOfPoint contour : contoursRed) {
             double area = Imgproc.contourArea(contour);
@@ -291,58 +364,38 @@ public class MainActivity extends CameraActivity implements CameraBridgeViewBase
         Mat resultStrawberry = Mat.zeros(maskStrawberry.size(), CvType.CV_8U);
         Mat resultRed = Mat.zeros(maskRed.size(), CvType.CV_8U);
 
-        Imgproc.drawContours(resultStrawberry, filteredContoursStrawberry, -1, new Scalar(255), Core.FILLED);
+        Imgproc.drawContours(resultStrawberry, filteredContoursStrawberry_area, -1, new Scalar(255), Core.FILLED);
         Imgproc.drawContours(resultRed, filteredContoursRed, -1, new Scalar(255), Core.FILLED);
 
+
+
+
         //maskStrawberryのピクセル計算
-        double all = Core.countNonZero(resultStrawberry) + 0.1;
+        all = Core.countNonZero(resultStrawberry) + 0.1;
 
-        /*Mat resultImage = new Mat();
-
-        // resultStrawberryの二値化画像をもとのRGB画像と合成
-        Mat resultStrawberry_hsv = new Mat();
-        Imgproc.cvtColor(resultStrawberry, resultImage, Imgproc.COLOR_GRAY2BGR);
-        //resultStrawberryのhsv画像を作成
-        Imgproc.cvtColor(resultStrawberry_hsv, resultStrawberry_hsv, Imgproc.COLOR_BGR2HSV);
-
-
-        // フィルタリング画像の赤のマスク
-        Mat mask_filter_Red = new Mat();
-        // フィルタリング画像からイチゴを抽出(Hueが0付近)
-        Mat mask_filter_Red_0 = new Mat();
-        Core.inRange(resultStrawberry_hsv, dr_lowerBound, dr_upperBound, mask_filter_Red_0);
-
-        // 赤色の抽出(Hueが179付近)
-        Mat mask_filter_Red_180 = new Mat();
-        Core.inRange(resultStrawberry_hsv, high_dr_lowerBound, high_dr_upperBound, mask_filter_Red_180);
-
-        //maskRed_0とmaskRed_180を合わせてmaskRedを作成
-        Core.bitwise_or(mask_filter_Red_0, mask_filter_Red_180,mask_filter_Red);
-
-*/
 
 
         //maskRedのピクセル計算
-        double red = Core.countNonZero(resultRed);
-        //maskStrawberryのピクセル計算
-        //double all = Core.countNonZero(resultStrawberry) + 0.1;
+        red = Core.countNonZero(resultRed);
+
 
 
         // maskRedの二値化画像をもとのRGB画像と合成
         Mat redImage = new Mat();
 
+
         //croppedResizeImageの場合------
-        croppedResizedImage.copyTo(redImage,maskGreen );
+        croppedResizedImage.copyTo(redImage,resultRed);
 
-        //croppedImageの場合------
-        //croppedImage.copyTo(redImage, binaryImage);
+        // maskGreenの二値化画像をもとのRGB画像と合成
+        Mat GreenImage = new Mat();
+        croppedResizedImage.copyTo(GreenImage,maskGreen );
+
+        Mat StrawberryImage = new Mat();
+        croppedResizedImage.copyTo(inputImage,resultStrawberry );
 
 
 
-        //croppedImageの場合------
-        //croppedImage.copyTo(resultImage, binaryImage);
-
-        //TextView text = (TextView) findViewById(R.id.pixelsInMask1str);
 
         // 一方のマスクがもう一方のマスクに占める割合を計算
         double ratio =red/all*100;
@@ -430,7 +483,7 @@ public class MainActivity extends CameraActivity implements CameraBridgeViewBase
 
         // 画像を表示////
         return inputImage;
-        //return redImage;
+        //return StrawberryImage;
 
 
     }
