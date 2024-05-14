@@ -19,6 +19,8 @@ import org.opencv.core.Core;
 import org.opencv.core.CvType;
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfPoint;
+import org.opencv.core.MatOfPoint2f;
+import org.opencv.core.Point;
 import org.opencv.core.Rect;
 import org.opencv.core.Scalar;
 import org.opencv.core.Size;
@@ -61,6 +63,20 @@ public class MainActivity extends CameraActivity implements CameraBridgeViewBase
             }
         }
     };
+
+    // 円形度を計算するメソッド
+    private double calculateCircularity(MatOfPoint contour) {
+        // 輪郭の面積
+        double area = Imgproc.contourArea(contour);
+        // 輪郭の外接円
+        Point center = new Point();
+        float[] radius = new float[1];
+        Imgproc.minEnclosingCircle(new MatOfPoint2f(contour.toArray()), center, radius);
+        // 外接円の面積
+        double circleArea = Math.PI * radius[0] * radius[0];
+        // 円形度を計算
+        return area / circleArea;
+    }
 
 
     public MainActivity() {
@@ -118,6 +134,8 @@ public class MainActivity extends CameraActivity implements CameraBridgeViewBase
             mLoaderCallback.onManagerConnected(LoaderCallbackInterface.SUCCESS);
         }
     }
+
+
 
     @Override
     protected List<? extends CameraBridgeViewBase> getCameraViewList() {
@@ -201,78 +219,147 @@ public class MainActivity extends CameraActivity implements CameraBridgeViewBase
         Log.i(TAG, "元の画像の幅: " + inputImage.width());
         Log.i(TAG, "元の画像の高さ: " + inputImage.height());
         //Mat rgbaImage = inputFrame.rgba(); // RGB画像を取得
-        Mat hsvImage = new Mat(); // 空のHSV画像を作成
-        Mat hueChannel = new Mat(); // 色相チャンネル画像を格納
-        Mat binaryImage = new Mat(); // 二値化画像を格納
-        Mat combineImage = new Mat();
-        Mat median = new Mat();
-        Mat maskRed = new Mat();
+        Mat hsvImage_crop = new Mat(); // 空のHSV画像を作成//crop
+        Mat hsvImage_input = new Mat();//input
+        Mat median_crop = new Mat();
+        Mat median_input = new Mat();
+        Mat maskRed_crop = new Mat();//crop
+        Mat maskRed_input = new Mat();//input
+        Mat maskGreen = new Mat();
         Mat maskStrawberry = new Mat();
 
         //croppedResizeImageの場合------
         //croppedResizeImageをメディアンフィルタをかける
-        Imgproc.medianBlur(croppedResizedImage, median, 1); // フィルタのカーネルサイズを調整可能
+        Imgproc.medianBlur(croppedResizedImage, median_crop, 1); // フィルタのカーネルサイズを調整可能
+        //inputimageでの処理
+        Imgproc.medianBlur(inputImage, median_input, 1);
+
         // RGBからHSVに変換
-        Imgproc.cvtColor(median, hsvImage, Imgproc.COLOR_RGB2HSV);
-
-        // 色相チャンネルを抽出
-        List<Mat> channels = new ArrayList<>();
-        Core.split(hsvImage, channels);
-        hueChannel = channels.get(0);
-
-
+        //croppedResizeImage
+        Imgproc.cvtColor(median_crop, hsvImage_crop, Imgproc.COLOR_RGB2HSV);
+        //inputimage
+        Imgproc.cvtColor(median_input, hsvImage_input, Imgproc.COLOR_RGB2HSV);
 
 
 
         // 赤色の抽出(Hueが0付近)
-        Mat maskRed_0 = new Mat();
+        //crop
+        Mat maskRed_0_crop = new Mat();
+        //input
+        Mat maskRed_0_input = new Mat();
+        //イチゴ用パラメータ
         Scalar dr_lowerBound = new Scalar(0, 127, 108);//(0, 127, 108)
         Scalar dr_upperBound = new Scalar(15, 251,255);//(11, 251, 255)
-        Core.inRange(hsvImage, dr_lowerBound, dr_upperBound, maskRed_0);
+        //マーカー用パラメータ
+        Scalar dr_lowerBound_marker = new Scalar(0, 127, 108);//(0, 127, 108)
+        Scalar dr_upperBound_marker = new Scalar(15, 251,255);//(11, 251, 255)
+        //cropimage
+        Core.inRange(hsvImage_crop, dr_lowerBound, dr_upperBound, maskRed_0_crop);
+        //inputimage
+        Core.inRange(hsvImage_input, dr_lowerBound_marker, dr_upperBound_marker, maskRed_0_input);
 
         // 赤色の抽出(Hueが179付近)
-        Mat maskRed_180 = new Mat();
+        //crop
+        Mat maskRed_180_crop = new Mat();
+        //input
+        Mat maskRed_180_input = new Mat();
+        //イチゴ用パラメータ
         Scalar high_dr_lowerBound = new Scalar(177,127,108);//(178,127,108
-        Scalar high_dr_upperBound = new Scalar(189,251,255);//(179,251,255
-        Core.inRange(hsvImage, high_dr_lowerBound, high_dr_upperBound, maskRed_180);
+        Scalar high_dr_upperBound = new Scalar(179,251,255);//(179,251,255
+        //マーカー用パラメータ
+        Scalar high_dr_lowerBound_marker = new Scalar(177,127,108);//(178,127,108
+        Scalar high_dr_upperBound_marker = new Scalar(179,251,255);//(179,251,255
+        //cropimage
+        Core.inRange(hsvImage_crop, high_dr_lowerBound, high_dr_upperBound, maskRed_180_crop);
+        //inputimage
+        Core.inRange(hsvImage_input, high_dr_lowerBound_marker, high_dr_upperBound_marker, maskRed_180_input);
 
         //maskRed_0とmaskRed_180を合わせてmaskRedを作成
-        Core.bitwise_or(maskRed_0, maskRed_180,maskRed);
+        //cropimage
+        Core.bitwise_or(maskRed_0_crop, maskRed_180_crop,maskRed_crop);
+        //inputimage
+        Core.bitwise_or(maskRed_0_input, maskRed_180_input,maskRed_input);
 
-
-        // 緑色の抽出
-        Mat maskGreen = new Mat();
-        Scalar gr_lowerBound = new Scalar(16, 11, 84);//(11, 11, 84)
-        Scalar gr_upperBound = new Scalar(50, 255, 255);//(45, 199, 239)
-        Core.inRange(hsvImage, gr_lowerBound, gr_upperBound, maskGreen);
+        // いちごの緑
+        Mat maskGreen_st = new Mat();
+        Scalar gr_st_lowerBound = new Scalar(20, 11, 150);//(11, 11, 84)
+        Scalar gr_st_upperBound = new Scalar(40, 199, 255);//(45, 199, 239)
+        Core.inRange(hsvImage_crop, gr_st_lowerBound , gr_st_upperBound, maskGreen_st);
+        //いちごの緑（境界）
+        Mat maskGreen_border = new Mat();
+        Scalar gr_border_lowerBound = new Scalar(15, 100, 150);//(11, 11, 84)
+        Scalar gr_border_upperBound = new Scalar(20, 251,255);//(45, 199, 239)
+        Core.inRange(hsvImage_crop, gr_border_lowerBound, gr_border_upperBound, maskGreen_border);
+        //maskGreen_stとmaskGreen_borderを合わせる
+        Core.bitwise_or(maskGreen_st, maskGreen_border,maskGreen);
 
         //maskRedとmaskGreenをあわせてmaskStrawberryを作成
-        Core.bitwise_or(maskRed, maskGreen, maskStrawberry);
+        Core.bitwise_or(maskRed_crop, maskGreen, maskStrawberry);
 
         // モルフォロジー変換
         Mat kernel = Imgproc.getStructuringElement(Imgproc.MORPH_RECT, new Size(3, 3));
         Imgproc.morphologyEx(maskStrawberry, maskStrawberry, Imgproc.MORPH_OPEN, kernel);
-        Imgproc.morphologyEx(maskRed, maskRed, Imgproc.MORPH_OPEN, kernel);
+        Imgproc.morphologyEx(maskRed_crop, maskRed_crop, Imgproc.MORPH_OPEN, kernel);
 
         // 輪郭抽出とフィルタリング
         List<MatOfPoint> contoursStrawberry = new ArrayList<>();
         List<MatOfPoint> contoursRed = new ArrayList<>();
+        //マーカー領域計算用のリスト
+        List<MatOfPoint> contours_mark = new ArrayList<>();
 
+        //イチゴ全体
         Imgproc.findContours(maskStrawberry, contoursStrawberry, new Mat(), Imgproc.RETR_EXTERNAL, Imgproc.CHAIN_APPROX_SIMPLE);
-        Imgproc.findContours(maskRed, contoursRed, new Mat(), Imgproc.RETR_EXTERNAL, Imgproc.CHAIN_APPROX_SIMPLE);
+        //イチゴの赤の部分
+        Imgproc.findContours(maskRed_crop, contoursRed, new Mat(), Imgproc.RETR_EXTERNAL, Imgproc.CHAIN_APPROX_SIMPLE);
+        //マーカー領域
+        Imgproc.findContours(maskRed_input, contours_mark, new Mat(), Imgproc.RETR_EXTERNAL, Imgproc.CHAIN_APPROX_SIMPLE);
 
+        //イチゴ全体
         List<MatOfPoint> filteredContoursStrawberry = new ArrayList<>();
+        //イチゴの赤の部分
         List<MatOfPoint> filteredContoursRed = new ArrayList<>();
+
+
+
+        boolean flag=false;
 
         for (MatOfPoint contour : contoursStrawberry) {
             double area = Imgproc.contourArea(contour);
+
             if (area > 3000) {
+
                 filteredContoursStrawberry.add(contour);
+                flag=true;
             }
+
         }
 
+
+
+        //条件クリアするイチゴが見つからなかったとき
+        double all = 0.0;
+        double red = 0.0;
+        if(!flag){
+            return inputImage;
+        }
+
+        //マーカー検出部
+        //inputimage上で円形度による認識（赤の領域内で）
+        for (MatOfPoint contour : contours_mark) {
+            //マーカーの円形度計算
+            double mark_cercle = calculateCircularity(contour);
+            // mark_cercleの値をログに出力
+            Log.d("MyApp", "円形度: " + mark_cercle);
+        }
+
+
+
+
+
+        //閾値以上のいちご領域抽出
         for (MatOfPoint contour : contoursRed) {
             double area = Imgproc.contourArea(contour);
+
             if (area > 3000) {
                 filteredContoursRed.add(contour);
             }
@@ -280,17 +367,17 @@ public class MainActivity extends CameraActivity implements CameraBridgeViewBase
 
         // フィルタリングされた輪郭を描画
         Mat resultStrawberry = Mat.zeros(maskStrawberry.size(), CvType.CV_8U);
-        Mat resultRed = Mat.zeros(maskRed.size(), CvType.CV_8U);
+        Mat resultRed = Mat.zeros(maskRed_crop.size(), CvType.CV_8U);
 
         Imgproc.drawContours(resultStrawberry, filteredContoursStrawberry, -1, new Scalar(255), Core.FILLED);
         Imgproc.drawContours(resultRed, filteredContoursRed, -1, new Scalar(255), Core.FILLED);
 
         //maskStrawberryのピクセル計算
-        double all = Core.countNonZero(resultStrawberry) + 0.1;
+        all = Core.countNonZero(resultStrawberry) + 0.1;
 
 
         //maskRedのピクセル計算
-        double red = Core.countNonZero(resultRed);
+        red = Core.countNonZero(resultRed);
         //maskStrawberryのピクセル計算
         //double all = Core.countNonZero(resultStrawberry) + 0.1;
 
@@ -303,6 +390,8 @@ public class MainActivity extends CameraActivity implements CameraBridgeViewBase
 
         // 一方のマスクがもう一方のマスクに占める割合を計算
         double ratio =red/all*100;
+
+
 
         BigDecimal bd = new BigDecimal(ratio);
         BigDecimal ripe_ratio = bd.setScale(2,BigDecimal.ROUND_HALF_UP);
@@ -386,8 +475,8 @@ public class MainActivity extends CameraActivity implements CameraBridgeViewBase
 
 
         // 画像を表示////
-        return inputImage;
-        //return redImage;
+        //return inputImage;
+        return resultStrawberry;
 
 
     }
