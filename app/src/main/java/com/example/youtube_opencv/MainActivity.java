@@ -224,7 +224,7 @@ public class MainActivity extends CameraActivity implements CameraBridgeViewBase
         Mat median_crop = new Mat();
         Mat median_input = new Mat();
         Mat maskRed_crop = new Mat();//crop
-        Mat maskRed_input = new Mat();//input
+        Mat mask_maker = new Mat();//input
         Mat maskGreen = new Mat();
         Mat maskStrawberry = new Mat();
 
@@ -245,40 +245,25 @@ public class MainActivity extends CameraActivity implements CameraBridgeViewBase
         // 赤色の抽出(Hueが0付近)
         //crop
         Mat maskRed_0_crop = new Mat();
-        //input
-        Mat maskRed_0_input = new Mat();
+
         //イチゴ用パラメータ
         Scalar dr_lowerBound = new Scalar(0, 127, 108);//(0, 127, 108)
         Scalar dr_upperBound = new Scalar(15, 251,255);//(11, 251, 255)
-        //マーカー用パラメータ
-        Scalar dr_lowerBound_marker = new Scalar(0, 127, 108);//(0, 127, 108)
-        Scalar dr_upperBound_marker = new Scalar(15, 251,255);//(11, 251, 255)
+
         //cropimage
         Core.inRange(hsvImage_crop, dr_lowerBound, dr_upperBound, maskRed_0_crop);
-        //inputimage
-        Core.inRange(hsvImage_input, dr_lowerBound_marker, dr_upperBound_marker, maskRed_0_input);
+
 
         // 赤色の抽出(Hueが179付近)
         //crop
         Mat maskRed_180_crop = new Mat();
-        //input
-        Mat maskRed_180_input = new Mat();
+
         //イチゴ用パラメータ
         Scalar high_dr_lowerBound = new Scalar(177,127,108);//(178,127,108
         Scalar high_dr_upperBound = new Scalar(179,251,255);//(179,251,255
-        //マーカー用パラメータ
-        Scalar high_dr_lowerBound_marker = new Scalar(177,127,108);//(178,127,108
-        Scalar high_dr_upperBound_marker = new Scalar(179,251,255);//(179,251,255
         //cropimage
         Core.inRange(hsvImage_crop, high_dr_lowerBound, high_dr_upperBound, maskRed_180_crop);
-        //inputimage
-        Core.inRange(hsvImage_input, high_dr_lowerBound_marker, high_dr_upperBound_marker, maskRed_180_input);
 
-        //maskRed_0とmaskRed_180を合わせてmaskRedを作成
-        //cropimage
-        Core.bitwise_or(maskRed_0_crop, maskRed_180_crop,maskRed_crop);
-        //inputimage
-        Core.bitwise_or(maskRed_0_input, maskRed_180_input,maskRed_input);
 
         // いちごの緑
         Mat maskGreen_st = new Mat();
@@ -296,6 +281,18 @@ public class MainActivity extends CameraActivity implements CameraBridgeViewBase
         //maskRedとmaskGreenをあわせてmaskStrawberryを作成
         Core.bitwise_or(maskRed_crop, maskGreen, maskStrawberry);
 
+
+        //マーカー用パラメータ
+        Scalar lower_marker = new Scalar(100,150,0);//(178,127,108
+        Scalar high_marker = new Scalar(140,255,255);//(179,251,255
+
+        //inputimage
+        Core.inRange(hsvImage_input, lower_marker, high_marker, mask_maker);
+        //maskRed_0とmaskRed_180を合わせてmaskRedを作成
+        //cropimage
+        Core.bitwise_or(maskRed_0_crop, maskRed_180_crop,maskRed_crop);
+
+
         // モルフォロジー変換
         Mat kernel = Imgproc.getStructuringElement(Imgproc.MORPH_RECT, new Size(3, 3));
         Imgproc.morphologyEx(maskStrawberry, maskStrawberry, Imgproc.MORPH_OPEN, kernel);
@@ -312,14 +309,14 @@ public class MainActivity extends CameraActivity implements CameraBridgeViewBase
         //イチゴの赤の部分
         Imgproc.findContours(maskRed_crop, contoursRed, new Mat(), Imgproc.RETR_EXTERNAL, Imgproc.CHAIN_APPROX_SIMPLE);
         //マーカー領域
-        Imgproc.findContours(maskRed_input, contours_mark, new Mat(), Imgproc.RETR_EXTERNAL, Imgproc.CHAIN_APPROX_SIMPLE);
+        Imgproc.findContours(mask_maker, contours_mark, new Mat(), Imgproc.RETR_EXTERNAL, Imgproc.CHAIN_APPROX_SIMPLE);
 
         //イチゴ全体
         List<MatOfPoint> filteredContoursStrawberry = new ArrayList<>();
         //イチゴの赤の部分
         List<MatOfPoint> filteredContoursRed = new ArrayList<>();
-
-
+        //マーカー
+        List<MatOfPoint> filteredContoursMark = new ArrayList<>();
 
         boolean flag=false;
 
@@ -337,11 +334,13 @@ public class MainActivity extends CameraActivity implements CameraBridgeViewBase
 
 
         //条件クリアするイチゴが見つからなかったとき
-        double all = 0.0;
-        double red = 0.0;
-        if(!flag){
-            return inputImage;
-        }
+        double all = 0.0;//イチゴ全体のピクセル数
+        double red = 0.0;//赤い部分のピクセル数
+        double marker = 0.0;//マーカーのピクセル数
+        //画像内にイチゴらしきものあれば以下の処理。なければ処理をスキップ
+//        if(!flag){
+//            return inputImage;
+//        }
 
         //マーカー検出部
         //inputimage上で円形度による認識（赤の領域内で）
@@ -350,6 +349,18 @@ public class MainActivity extends CameraActivity implements CameraBridgeViewBase
             double mark_cercle = calculateCircularity(contour);
             // mark_cercleの値をログに出力
             Log.d("MyApp", "円形度: " + mark_cercle);
+            double mark_area = Imgproc.contourArea(contour);
+
+            if (mark_area > 1000) {
+
+                if(mark_cercle > 0.8){
+                    //mark_area,mark_cercleの条件クリアしたら
+                    filteredContoursMark.add(contour);
+                }
+
+
+            }
+
         }
 
 
@@ -368,18 +379,35 @@ public class MainActivity extends CameraActivity implements CameraBridgeViewBase
         // フィルタリングされた輪郭を描画
         Mat resultStrawberry = Mat.zeros(maskStrawberry.size(), CvType.CV_8U);
         Mat resultRed = Mat.zeros(maskRed_crop.size(), CvType.CV_8U);
+        Mat resultMark = Mat.zeros(mask_maker.size(), CvType.CV_8U);
 
+        //輪郭内を塗りつぶす
         Imgproc.drawContours(resultStrawberry, filteredContoursStrawberry, -1, new Scalar(255), Core.FILLED);
         Imgproc.drawContours(resultRed, filteredContoursRed, -1, new Scalar(255), Core.FILLED);
+        Imgproc.drawContours(resultMark, filteredContoursMark, -1, new Scalar(255), Core.FILLED);
 
         //maskStrawberryのピクセル計算
         all = Core.countNonZero(resultStrawberry) + 0.1;
-
-
         //maskRedのピクセル計算
         red = Core.countNonZero(resultRed);
-        //maskStrawberryのピクセル計算
-        //double all = Core.countNonZero(resultStrawberry) + 0.1;
+        //マーカーのピクセル計算
+        marker = Core.countNonZero(resultMark);
+
+        //マーカーのサイズ
+        double marker_size=20.0;
+
+        //makerが検出されない場合（面積が0の場合）
+        if (marker > 1000) {
+            //1cm^2あたりのピクセル数
+            double base_pixel = marker/marker_size;
+            Log.d("base_pixel", "サイズ: " + base_pixel);
+            //予測サイズ
+            double predict_size = all/base_pixel;
+            Log.d("predictsize", "サイズ: " + predict_size);
+
+        }
+
+
 
 
         // maskRedの二値化画像をもとのRGB画像と合成
@@ -476,6 +504,7 @@ public class MainActivity extends CameraActivity implements CameraBridgeViewBase
 
         // 画像を表示////
         //return inputImage;
+        //return mask_maker;
         return resultStrawberry;
 
 
