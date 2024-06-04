@@ -252,7 +252,7 @@ public class MainActivity extends CameraActivity implements CameraBridgeViewBase
         Scalar dr_upperBound = new Scalar(15, 251,255);//(11, 251, 255)
 
         //cropimage
-        Core.inRange(hsvImage_crop, dr_lowerBound, dr_upperBound, maskRed_0_crop);
+        Core.inRange(hsvImage_input, dr_lowerBound, dr_upperBound, maskRed_0_crop);
 
 
         // 赤色の抽出(Hueが179付近)
@@ -266,7 +266,7 @@ public class MainActivity extends CameraActivity implements CameraBridgeViewBase
         Scalar high_dr_lowerBound_marker = new Scalar(177,127,108);//(178,127,108
         Scalar high_dr_upperBound_marker = new Scalar(179,251,255);//(179,251,255
         //cropimage
-        Core.inRange(hsvImage_crop, high_dr_lowerBound, high_dr_upperBound, maskRed_180_crop);
+        Core.inRange(hsvImage_input, high_dr_lowerBound, high_dr_upperBound, maskRed_180_crop);
 
 
         //maskRed_0とmaskRed_180を合わせてmaskRedを作成
@@ -284,12 +284,12 @@ public class MainActivity extends CameraActivity implements CameraBridgeViewBase
         Mat maskGreen_st = new Mat();
         Scalar gr_st_lowerBound = new Scalar(20, 11, 150);//(11, 11, 84)
         Scalar gr_st_upperBound = new Scalar(40, 199, 255);//(45, 199, 239)
-        Core.inRange(hsvImage_crop, gr_st_lowerBound , gr_st_upperBound, maskGreen_st);
+        Core.inRange(hsvImage_input, gr_st_lowerBound , gr_st_upperBound, maskGreen_st);
         //いちごの緑（境界）
         Mat maskGreen_border = new Mat();
         Scalar gr_border_lowerBound = new Scalar(15, 100, 150);//(11, 11, 84)
         Scalar gr_border_upperBound = new Scalar(20, 251,255);//(45, 199, 239)
-        Core.inRange(hsvImage_crop, gr_border_lowerBound, gr_border_upperBound, maskGreen_border);
+        Core.inRange(hsvImage_input, gr_border_lowerBound, gr_border_upperBound, maskGreen_border);
         //maskGreen_stとmaskGreen_borderを合わせる
         Core.bitwise_or(maskGreen_st, maskGreen_border,maskGreen);
 
@@ -326,11 +326,15 @@ public class MainActivity extends CameraActivity implements CameraBridgeViewBase
 
         for (MatOfPoint contour : contoursStrawberry) {
             double area = Imgproc.contourArea(contour);
-
+            double cercle = calculateCircularity(contour);
             if (area > 3000) {
+                //イチゴ全体のマスクに円形度を入れると熟度が100を超えてしまう
+                //二値化画像の抽出の際に画面の中央に一番近いものを選択するプログラムを書く
+                if(cercle > 0.6){
+                    filteredContoursStrawberry.add(contour);
+                    flag=true;
+                }
 
-                filteredContoursStrawberry.add(contour);
-                flag=true;
             }
 
         }
