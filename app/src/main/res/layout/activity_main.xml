@@ -35,17 +35,17 @@
         tools:ignore="MissingClass" />
 
 
-    <View
-        android:id="@+id/frameView"
-        android:layout_width="217dp"
-        android:layout_height="255dp"
-        android:layout_gravity="center"
-        android:background="@drawable/shape_style"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.444" />
+<!--    <View-->
+<!--        android:id="@+id/frameView"-->
+<!--        android:layout_width="217dp"-->
+<!--        android:layout_height="255dp"-->
+<!--        android:layout_gravity="center"-->
+<!--        android:background="@drawable/shape_style"-->
+<!--        app:layout_constraintBottom_toBottomOf="parent"-->
+<!--        app:layout_constraintLeft_toLeftOf="parent"-->
+<!--        app:layout_constraintRight_toRightOf="parent"-->
+<!--        app:layout_constraintTop_toTopOf="parent"-->
+<!--        app:layout_constraintVertical_bias="0.444" />-->
 
     <TextView
         android:id="@+id/pixelsInMask1str"
@@ -78,6 +78,22 @@
         app:layout_constraintVertical_bias="0.912" />
 
     <!--基準点1(harfripe)-->
+
+    <TextView
+        android:id="@+id/targetsize"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="#77FFFFFF"
+        android:text=""
+        android:textColor="@color/black"
+        android:textSize="50dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.873"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.259" />
+
     <TextView
         android:id="@+id/color_box_harf"
         android:layout_width="414dp"

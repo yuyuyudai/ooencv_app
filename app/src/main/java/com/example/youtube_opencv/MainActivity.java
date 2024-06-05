@@ -38,6 +38,7 @@ public class MainActivity extends CameraActivity implements CameraBridgeViewBase
 
     public TextView pixelCountTextView;
     public TextView predictTextView;
+    public TextView targetsize;
     public TextView coloredText_overripe;
     public TextView coloredBox_harf;
     public TextView coloredBox_ripe;
@@ -98,8 +99,9 @@ public class MainActivity extends CameraActivity implements CameraBridgeViewBase
 
         //((Vibrator) getSystemService(Context.VIBRATOR_SERVICE)).vibrate(1000);
 
-        pixelCountTextView = (TextView)findViewById(R.id.pixelsInMask1str);
-        predictTextView = (TextView)findViewById(R.id.predict);
+        pixelCountTextView = (TextView)findViewById(R.id.pixelsInMask1str);//熟度のid
+        predictTextView = (TextView)findViewById(R.id.predict);//予測時間のid
+        targetsize = (TextView)findViewById(R.id.targetsize);
         coloredText_overripe = findViewById(R.id.color_box_overripe_text);
         coloredBox_harf = findViewById(R.id.color_box_harf);
         coloredBox_ripe = findViewById(R.id.color_box_ripe);
@@ -158,7 +160,6 @@ public class MainActivity extends CameraActivity implements CameraBridgeViewBase
 
 
     private Mat mMat;
-    private static int ratio = 0;
 
     private static final int SUBSAMPLING_FACTOR=5;
     private int frameCounter=0;
@@ -403,6 +404,7 @@ public class MainActivity extends CameraActivity implements CameraBridgeViewBase
 
         //マーカーのサイズ
         double marker_size=3.14;
+        double predict_size=0.0;
 
         //makerが検出されない場合（面積が0の場合）
         if (marker > 2000) {
@@ -411,12 +413,16 @@ public class MainActivity extends CameraActivity implements CameraBridgeViewBase
             double base_pixel = marker/marker_size;
             Log.d("base_pixel", "サイズ: " + base_pixel);
             //予測サイズ
-            double predict_size = all/base_pixel;
+            predict_size = all/base_pixel;
             Log.d("predictsize", "予想値: " + predict_size);
 
         }
 
 
+        BigDecimal round = new BigDecimal(predict_size);
+        BigDecimal predict_size_round = round.setScale(2, BigDecimal.ROUND_HALF_UP);
+        // predict_size_roundをdoubleに変換してからfinal変数に格納する
+        final double finalPredict_Size = predict_size_round.doubleValue();
 
 
 
@@ -451,7 +457,6 @@ public class MainActivity extends CameraActivity implements CameraBridgeViewBase
 
 
 
-
         runOnUiThread(new Runnable(){
 
             @Override
@@ -461,13 +466,16 @@ public class MainActivity extends CameraActivity implements CameraBridgeViewBase
 
                 if(predict_time_dif > 0 && ratio == 0){
                     predictTextView.setText(String.valueOf(""));
+                    targetsize.setText(String.valueOf(""));
 
                 }
                 else if (predict_time_dif > 0 && ratio != 0){
                     predictTextView.setText(String.valueOf(predict_time_hour)+"時間"+String.valueOf(predict_time_minutes)+"分後");
+                    targetsize.setText(String.valueOf(finalPredict_Size)+"cm");
                 }
                 else{
                     predictTextView.setText("収穫可能");
+                    targetsize.setText(String.valueOf(finalPredict_Size)+"cm");
                 }
 
 
@@ -514,8 +522,8 @@ public class MainActivity extends CameraActivity implements CameraBridgeViewBase
 
 
         // 画像を表示////
-        //return inputImage;
-        return resultStrawberry;
+        return inputImage;
+        //return resultStrawberry;
         //return mask_maker;
 
     }
