@@ -297,10 +297,52 @@ public class MainActivity extends CameraActivity implements CameraBridgeViewBase
         //maskRedとmaskGreenをあわせてmaskStrawberryを作成
         Core.bitwise_or(maskRed_crop, maskGreen, maskStrawberry);
 
+        //輪郭を抽出し、中央から一番近い領域のみを残す-------------
+        // 輪郭を検出
+        List<MatOfPoint> contours = new ArrayList<>();
+        Mat hierarchy = new Mat();
+        Imgproc.findContours(maskStrawberry, contours, hierarchy, Imgproc.RETR_EXTERNAL, Imgproc.CHAIN_APPROX_SIMPLE);
+
+        // 画像の中心点を計算
+        Point center = new Point(maskStrawberry.cols() / 2.0, maskStrawberry.rows() / 2.0);
+
+        // 中心から最も近い輪郭を見つける
+        double minDistance = Double.MAX_VALUE;
+        MatOfPoint closestContour = null;
+
+        for (MatOfPoint contour : contours) {
+            Rect boundingRect = Imgproc.boundingRect(contour);
+            Point contourCenter = new Point(boundingRect.x + boundingRect.width / 2.0, boundingRect.y + boundingRect.height / 2.0);
+            double distance = Imgproc.pointPolygonTest(new MatOfPoint2f(contour.toArray()), center, true);
+
+            if (Math.abs(distance) < minDistance) {
+                minDistance = Math.abs(distance);
+                closestContour = contour;
+            }
+        }
+        // 最も近い輪郭のみを残す新しいマスクを作成
+        Mat mask = Mat.zeros(maskStrawberry.size(), CvType.CV_8UC1);
+        if (closestContour != null) {
+            List<MatOfPoint> closestContourList = new ArrayList<>();
+            closestContourList.add(closestContour);
+            Imgproc.drawContours(mask, closestContourList, -1, new Scalar(255), Core.FILLED);
+        }
+
+        // 最も近い輪郭のみを残した画像
+        Mat maskStrawberry_find = new Mat();
+        Mat maskRed_find = new Mat();
+        Core.bitwise_and(maskStrawberry, mask, maskStrawberry_find);
+        Core.bitwise_and(maskRed_crop, mask, maskRed_find);
+        //maskStrawberrryからmaskStrawberry_findを作成
+        //maskRed_cropからmaskRed_findを作成
+        //---------------------------------------
+
+
+
         // モルフォロジー変換
         Mat kernel = Imgproc.getStructuringElement(Imgproc.MORPH_RECT, new Size(3, 3));
-        Imgproc.morphologyEx(maskStrawberry, maskStrawberry, Imgproc.MORPH_OPEN, kernel);
-        Imgproc.morphologyEx(maskRed_crop, maskRed_crop, Imgproc.MORPH_OPEN, kernel);
+        Imgproc.morphologyEx(maskStrawberry_find, maskStrawberry_find, Imgproc.MORPH_OPEN, kernel);
+        Imgproc.morphologyEx(maskRed_find, maskRed_find, Imgproc.MORPH_OPEN, kernel);
 
         // 輪郭抽出とフィルタリング
         List<MatOfPoint> contoursStrawberry = new ArrayList<>();
@@ -309,9 +351,9 @@ public class MainActivity extends CameraActivity implements CameraBridgeViewBase
         List<MatOfPoint> contours_mark = new ArrayList<>();
 
         //イチゴ全体
-        Imgproc.findContours(maskStrawberry, contoursStrawberry, new Mat(), Imgproc.RETR_EXTERNAL, Imgproc.CHAIN_APPROX_SIMPLE);
+        Imgproc.findContours(maskStrawberry_find, contoursStrawberry, new Mat(), Imgproc.RETR_EXTERNAL, Imgproc.CHAIN_APPROX_SIMPLE);
         //イチゴの赤の部分
-        Imgproc.findContours(maskRed_crop, contoursRed, new Mat(), Imgproc.RETR_EXTERNAL, Imgproc.CHAIN_APPROX_SIMPLE);
+        Imgproc.findContours(maskRed_find, contoursRed, new Mat(), Imgproc.RETR_EXTERNAL, Imgproc.CHAIN_APPROX_SIMPLE);
         //マーカー領域
         Imgproc.findContours(mask_maker, contours_mark, new Mat(), Imgproc.RETR_EXTERNAL, Imgproc.CHAIN_APPROX_SIMPLE);
 
@@ -325,16 +367,17 @@ public class MainActivity extends CameraActivity implements CameraBridgeViewBase
 
         boolean flag=false;
 
+        //イチゴ全体を検出
         for (MatOfPoint contour : contoursStrawberry) {
             double area = Imgproc.contourArea(contour);
             double cercle = calculateCircularity(contour);
             if (area > 3000) {
                 //イチゴ全体のマスクに円形度を入れると熟度が100を超えてしまう
                 //二値化画像の抽出の際に画面の中央に一番近いものを選択するプログラムを書く
-                if(cercle > 0.6){
+                //if(cercle > 0.6){
                     filteredContoursStrawberry.add(contour);
                     flag=true;
-                }
+                //}
 
             }
 
@@ -376,7 +419,7 @@ public class MainActivity extends CameraActivity implements CameraBridgeViewBase
 
 
 
-        //閾値以上のいちご領域抽出
+        //いちごの赤の部分検出
         for (MatOfPoint contour : contoursRed) {
             double area = Imgproc.contourArea(contour);
 
@@ -386,8 +429,8 @@ public class MainActivity extends CameraActivity implements CameraBridgeViewBase
         }
 
         // フィルタリングされた輪郭を描画
-        Mat resultStrawberry = Mat.zeros(maskStrawberry.size(), CvType.CV_8U);
-        Mat resultRed = Mat.zeros(maskRed_crop.size(), CvType.CV_8U);
+        Mat resultStrawberry = Mat.zeros(maskStrawberry_find.size(), CvType.CV_8U);
+        Mat resultRed = Mat.zeros(maskRed_find.size(), CvType.CV_8U);
         Mat resultMark = Mat.zeros(mask_maker.size(), CvType.CV_8U);
 
         Imgproc.drawContours(resultStrawberry, filteredContoursStrawberry, -1, new Scalar(255), Core.FILLED);
@@ -522,8 +565,8 @@ public class MainActivity extends CameraActivity implements CameraBridgeViewBase
 
 
         // 画像を表示////
-        return inputImage;
-        //return resultStrawberry;
+        //return inputImage;
+        return resultStrawberry;
         //return mask_maker;
 
     }
