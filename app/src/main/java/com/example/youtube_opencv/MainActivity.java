@@ -79,6 +79,19 @@ public class MainActivity extends CameraActivity implements CameraBridgeViewBase
         return area / circleArea;
     }
 
+    // いちごの二値化画像に対していちごを囲む矩形領域を見つけて描画するメソッド
+    public void BoundingBox_strawberry(Mat image, MatOfPoint contour) {
+        // 輪郭を囲む矩形領域を取得
+        Rect rect = Imgproc.boundingRect(contour);
+        // 矩形を描画
+        Imgproc.rectangle(image, rect.tl(), rect.br(), new Scalar(0, 255, 0), 5);
+    }
+    public void BoundingBox_marker(Mat image, MatOfPoint contour) {
+        // 輪郭を囲む矩形領域を取得
+        Rect rect = Imgproc.boundingRect(contour);
+        // 矩形を描画
+        Imgproc.rectangle(image, rect.tl(), rect.br(), new Scalar(0, 0, 255), 5);
+    }
 
     public MainActivity() {
         Log.i(TAG, "Instantiated new " + this.getClass());
@@ -164,28 +177,7 @@ public class MainActivity extends CameraActivity implements CameraBridgeViewBase
     private static final int SUBSAMPLING_FACTOR=5;
     private int frameCounter=0;
     public Mat onCameraFrame(CameraBridgeViewBase.CvCameraViewFrame inputFrame) {
-        //-------https://coskxlabsite.stars.ne.jp/html/android/OpenCVpreview/OpenCVpreview_A.html
-        //return inputFrame.rgba();
-        //mMat= inputFrame.rgba();    //color
-        //mMat= inputFrame.gray();    //grayscale
-        //Core.bitwise_not(inputFrame.rgba(), mMat); //reversed
-        //Core.bitwise_not(inputFrame.gray(), mMat); //grayscale reversed
-        //Imgproc.Canny(inputFrame.gray(), mMat, 100, 200); //grayscale canny filtering
-        //Imgproc.threshold(inputFrame.gray(), mMat, 0.0, 255.0, Imgproc.THRESH_OTSU); //grayscale binarization with Ohtsu
-        //return mMat;//これで表示
 
-
-        //--------------hsv変換
-        /*Mat rgbImage = inputFrame.rgba();//rgb画像を取得
-        Mat hsvImage = new Mat();//空のhsv画像を作成
-
-        // RGBからHSVに変換
-        Imgproc.cvtColor(rgbImage, hsvImage, Imgproc.COLOR_RGB2HSV);
-
-        // ここでhsvImageを使用してさまざまな処理を行うことができます
-
-        // 画像を表示
-        return hsvImage;*/
 
         frameCounter++;
         if (frameCounter % SUBSAMPLING_FACTOR != 0) {
@@ -376,7 +368,9 @@ public class MainActivity extends CameraActivity implements CameraBridgeViewBase
                 //二値化画像の抽出の際に画面の中央に一番近いものを選択するプログラムを書く
                 //if(cercle > 0.6){
                     filteredContoursStrawberry.add(contour);
+                    BoundingBox_strawberry(inputImage,contour);
                     flag=true;
+
                 //}
 
             }
@@ -404,9 +398,10 @@ public class MainActivity extends CameraActivity implements CameraBridgeViewBase
 
             if (mark_area > 2000) {
 
-                if(mark_cercle > 0.8){
+                if(mark_cercle > 0.95){
                     //mark_area,mark_cercleの条件クリアしたら
                     filteredContoursMark.add(contour);
+                    BoundingBox_marker(inputImage,contour);
                 }
 
 
@@ -498,8 +493,6 @@ public class MainActivity extends CameraActivity implements CameraBridgeViewBase
 
 
 
-
-
         runOnUiThread(new Runnable(){
 
             @Override
@@ -555,6 +548,7 @@ public class MainActivity extends CameraActivity implements CameraBridgeViewBase
         });
 
 
+
         //pixelCountTextView.setText(String.valueOf(a));
         //pixelCountTextView.setText(abc);
 
@@ -565,8 +559,8 @@ public class MainActivity extends CameraActivity implements CameraBridgeViewBase
 
 
         // 画像を表示////
-        //return inputImage;
-        return resultStrawberry;
+        return inputImage;
+        //return resultStrawberry;
         //return mask_maker;
 
     }
