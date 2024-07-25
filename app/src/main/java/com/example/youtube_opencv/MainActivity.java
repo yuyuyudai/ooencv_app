@@ -1,6 +1,7 @@
 package com.example.youtube_opencv;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Vibrator;
 import android.util.Log;
@@ -127,6 +128,15 @@ public class MainActivity extends CameraActivity implements CameraBridgeViewBase
         mOpenCvCameraView.setCvCameraViewListener(this);
         //requesting previewsize option (maxWidth > maxHeight)
         mOpenCvCameraView.setMaxFrameSize(960, 720);
+
+        //ボタンを押した処理
+        findViewById(R.id.seni_button01).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                finish();
+            }
+        });
+
     }
 
     @Override
@@ -186,85 +196,52 @@ public class MainActivity extends CameraActivity implements CameraBridgeViewBase
 
         Mat inputImage = inputFrame.rgba();  // inputFrame に元の画像が含まれていると仮定
 
-        //トリミング処理
-        // トリミングおよびリサイズのパラメータを定義
-        // 中心座標の計算
-        int centerX = inputImage.width() / 2;
-        int centerY = inputImage.height() / 2;
-
-        // 1/2サイズの画像の切り出し
-        int halfWidth = inputImage.width()/2;
-        int halfHeight = inputImage.height() / 2;
-
-        int startX = centerX - halfWidth / 2;
-        int startY = centerY - halfHeight / 2;
-        Rect cropRect = new Rect(startX, startY-50, halfWidth,halfHeight );  // トリミングする領域を定義
-        Size newSize = new Size(inputImage.width(),inputImage.height()); // 出力サイズを定義
-
-        // 入力画像をトリミングおよびリサイズ
-        Mat croppedResizedImage = new Mat();
-        Mat croppedImage = new Mat(inputImage, cropRect);  // 画像をトリミング
-        //リサイズせずにトリミング画像で画像処理を行ったほうが良い？
-        Imgproc.resize(croppedImage, croppedResizedImage, newSize);  // トリミングした画像をリサイズ
-
-        // これで croppedResizedImage 上でさらなる処理を実行できます
-
         Log.i(TAG, "元の画像の幅: " + inputImage.width());
         Log.i(TAG, "元の画像の高さ: " + inputImage.height());
-        //Mat rgbaImage = inputFrame.rgba(); // RGB画像を取得
-        Mat hsvImage_crop = new Mat(); // 空のHSV画像を作成//crop
         Mat hsvImage_input = new Mat();//input
-        Mat median_crop = new Mat();
         Mat median_input = new Mat();
-        Mat maskRed_crop = new Mat();//crop
+        Mat maskRed = new Mat();//input
         Mat mask_maker = new Mat();//input
         Mat maskGreen = new Mat();
         Mat maskStrawberry = new Mat();
 
-        //croppedResizeImageの場合------
-        //croppedResizeImageをメディアンフィルタをかける
-        Imgproc.medianBlur(croppedResizedImage, median_crop, 1); // フィルタのカーネルサイズを調整可能
+
         //inputimageでの処理
         Imgproc.medianBlur(inputImage, median_input, 1);
 
         // RGBからHSVに変換
-        //croppedResizeImage
-        Imgproc.cvtColor(median_crop, hsvImage_crop, Imgproc.COLOR_RGB2HSV);
+
         //inputimage
         Imgproc.cvtColor(median_input, hsvImage_input, Imgproc.COLOR_RGB2HSV);
 
 
 
         // 赤色の抽出(Hueが0付近)
-        //crop
-        Mat maskRed_0_crop = new Mat();
+        Mat maskRed_0 = new Mat();
         //input
 
         //イチゴ用パラメータ
-        Scalar dr_lowerBound = new Scalar(0, 127, 108);//(0, 127, 108)
-        Scalar dr_upperBound = new Scalar(15, 251,255);//(11, 251, 255)
+        Scalar dr_lowerBound = new Scalar(0,120,78);//本物(0, 127, 108)　　レプリカ(0,120,78)
+        Scalar dr_upperBound = new Scalar(13, 255, 255);//本物(15, 251,255)　レプリカ(13, 255, 255)
 
-        //cropimage
-        Core.inRange(hsvImage_input, dr_lowerBound, dr_upperBound, maskRed_0_crop);
+        //inputimage
+        Core.inRange(hsvImage_input, dr_lowerBound, dr_upperBound, maskRed_0);
 
 
         // 赤色の抽出(Hueが179付近)
-        //crop
-        Mat maskRed_180_crop = new Mat();
+        Mat maskRed_180 = new Mat();
 
         //イチゴ用パラメータ
-        Scalar high_dr_lowerBound = new Scalar(177,127,108);//(178,127,108
-        Scalar high_dr_upperBound = new Scalar(179,251,255);//(179,251,255
-        //マーカー用パラメータ
-        Scalar high_dr_lowerBound_marker = new Scalar(177,127,108);//(178,127,108
-        Scalar high_dr_upperBound_marker = new Scalar(179,251,255);//(179,251,255
-        //cropimage
-        Core.inRange(hsvImage_input, high_dr_lowerBound, high_dr_upperBound, maskRed_180_crop);
+        Scalar high_dr_lowerBound = new Scalar(160,50,24);//本物(177,127,108)　　レプリカ(172,120,34)
+        Scalar high_dr_upperBound = new Scalar(179,255,255);//本物(179,251,255)　　レプリカ(179,255,255)
+
+        //inputimage
+        Core.inRange(hsvImage_input, high_dr_lowerBound, high_dr_upperBound, maskRed_180);
 
 
         //maskRed_0とmaskRed_180を合わせてmaskRedを作成
-        //cropimage
-        Core.bitwise_or(maskRed_0_crop, maskRed_180_crop,maskRed_crop);
+        //inputimage
+        Core.bitwise_or(maskRed_0, maskRed_180,maskRed);
 
 
         //マーカー用パラメータ
@@ -275,19 +252,19 @@ public class MainActivity extends CameraActivity implements CameraBridgeViewBase
 
         // いちごの緑
         Mat maskGreen_st = new Mat();
-        Scalar gr_st_lowerBound = new Scalar(20, 11, 150);//(11, 11, 84)
-        Scalar gr_st_upperBound = new Scalar(40, 199, 255);//(45, 199, 239)
+        Scalar gr_st_lowerBound = new Scalar(20, 29, 103);//本物(20, 11, 150)　　レプリカ(20, 29, 103)
+        Scalar gr_st_upperBound = new Scalar(50, 255, 255);//本物(40, 199, 255)　レプリカ(60, 137, 255)
         Core.inRange(hsvImage_input, gr_st_lowerBound , gr_st_upperBound, maskGreen_st);
         //いちごの緑（境界）
         Mat maskGreen_border = new Mat();
-        Scalar gr_border_lowerBound = new Scalar(15, 100, 150);//(11, 11, 84)
-        Scalar gr_border_upperBound = new Scalar(20, 251,255);//(45, 199, 239)
+        Scalar gr_border_lowerBound = new Scalar(14,120,78);//本物(15, 100, 150)　　レプリカ(14,254,103)
+        Scalar gr_border_upperBound = new Scalar(20,255,255);//本物(20, 251,255)　　レプリカ(20,255,255)
         Core.inRange(hsvImage_input, gr_border_lowerBound, gr_border_upperBound, maskGreen_border);
         //maskGreen_stとmaskGreen_borderを合わせる
         Core.bitwise_or(maskGreen_st, maskGreen_border,maskGreen);
 
         //maskRedとmaskGreenをあわせてmaskStrawberryを作成
-        Core.bitwise_or(maskRed_crop, maskGreen, maskStrawberry);
+        Core.bitwise_or(maskRed, maskGreen, maskStrawberry);
 
         //輪郭を抽出し、中央から一番近い領域のみを残す-------------
         // 輪郭を検出
@@ -324,9 +301,9 @@ public class MainActivity extends CameraActivity implements CameraBridgeViewBase
         Mat maskStrawberry_find = new Mat();
         Mat maskRed_find = new Mat();
         Core.bitwise_and(maskStrawberry, mask, maskStrawberry_find);
-        Core.bitwise_and(maskRed_crop, mask, maskRed_find);
+        Core.bitwise_and(maskRed, mask, maskRed_find);
         //maskStrawberrryからmaskStrawberry_findを作成
-        //maskRed_cropからmaskRed_findを作成
+
         //---------------------------------------
 
 
@@ -359,6 +336,28 @@ public class MainActivity extends CameraActivity implements CameraBridgeViewBase
 
         boolean flag=false;
 
+        //マーカー検出部
+        for (MatOfPoint contour : contours_mark) {
+            //マーカーの円形度計算
+            double mark_cercle = calculateCircularity(contour);
+            // mark_cercleの値をログに出力
+            Log.d("MyApp", "円形度: " + mark_cercle);
+            double mark_area = Imgproc.contourArea(contour);
+
+            if (mark_area > 2000) {
+
+                if(mark_cercle > 0.9){
+                    //mark_area,mark_cercleの条件クリアしたら
+                    filteredContoursMark.add(contour);
+                    BoundingBox_marker(inputImage,contour);
+                }
+
+
+            }
+
+
+        }
+
         //イチゴ全体を検出
         for (MatOfPoint contour : contoursStrawberry) {
             double area = Imgproc.contourArea(contour);
@@ -387,28 +386,7 @@ public class MainActivity extends CameraActivity implements CameraBridgeViewBase
 //            return inputImage;
 //        }
 
-        //マーカー検出部
-        //inputimage上で円形度による認識（赤の領域内で）
-        for (MatOfPoint contour : contours_mark) {
-            //マーカーの円形度計算
-            double mark_cercle = calculateCircularity(contour);
-            // mark_cercleの値をログに出力
-            Log.d("MyApp", "円形度: " + mark_cercle);
-            double mark_area = Imgproc.contourArea(contour);
 
-            if (mark_area > 2000) {
-
-                if(mark_cercle > 0.95){
-                    //mark_area,mark_cercleの条件クリアしたら
-                    filteredContoursMark.add(contour);
-                    BoundingBox_marker(inputImage,contour);
-                }
-
-
-            }
-
-
-        }
 
 
 
@@ -465,10 +443,7 @@ public class MainActivity extends CameraActivity implements CameraBridgeViewBase
 
 
 
-        // maskRedの二値化画像をもとのRGB画像と合成
-        Mat redImage = new Mat();
 
-        croppedResizedImage.copyTo(redImage,maskGreen );
 
 
         // 一方のマスクがもう一方のマスクに占める割合を計算
@@ -562,6 +537,7 @@ public class MainActivity extends CameraActivity implements CameraBridgeViewBase
         return inputImage;
         //return resultStrawberry;
         //return mask_maker;
+
 
     }
 }
