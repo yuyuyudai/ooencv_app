@@ -219,90 +219,123 @@ public class MainActivity extends CameraActivity implements CameraBridgeViewBase
         //inputimage
         Imgproc.cvtColor(median_input, hsvImage_input, Imgproc.COLOR_RGB2HSV);
 
-        //-------------------補正用マーカー取得---------------
-        Mat maskMarker = new Mat();
-        //青色マーカー抽出
-        Scalar lowerBlue = new Scalar(100, 150, 0);
-        Scalar upperBlue = new Scalar(140, 255, 255);
-        Core.inRange(hsvImage_input, lowerBlue, upperBlue, maskMarker);
-        // 輪郭抽出
-        List<MatOfPoint> contours_correction = new ArrayList<>();
-        Mat hierarchy_correction = new Mat();
-        Imgproc.findContours(maskMarker, contours_correction, hierarchy_correction, Imgproc.RETR_EXTERNAL, Imgproc.CHAIN_APPROX_SIMPLE);
-        // 最大の輪郭を見つける（円形度が0.9以上のものを対象）
-        double maxArea = 0;
-        MatOfPoint largestContour = null;
-        for (MatOfPoint contour : contours_correction) {
-            double area = Imgproc.contourArea(contour);
-            double circularity = calculateCircularity(contour); // 円形度を計算
-            if (area > maxArea && circularity >= 0.9) {
-                maxArea = area;
-                largestContour = contour;
-            }
-        }
-        // 最大の輪郭の中心座標を計算
-        Point center_correction = new Point();
-        if (largestContour != null) {
-            //中心座標の取得
-            Rect boundingRect = Imgproc.boundingRect(largestContour);
-            center_correction.x = boundingRect.x + boundingRect.width / 2;
-            center_correction.y = boundingRect.y + boundingRect.height / 2;
 
-            // マーカーの矩形領域を描画
-            // バウンディングボックスを一回り大きくする
-            int increase = 10; // 10ピクセルずつ増やす
-            int x = Math.max(boundingRect.x - increase, 0);
-            int y = Math.max(boundingRect.y - increase, 0);
-            int width = boundingRect.width + 2 * increase;
-            int height = boundingRect.height + 2 * increase;
-            // 画像の境界を越えないように調整
-            width = Math.min(width, inputImage.cols() - x);
-            height = Math.min(height, inputImage.rows() - y);
-            // 拡大されたバウンディングボックス
-            Rect expandedBoundingRect = new Rect(x, y, width, height);
-            // マーカーの矩形領域を描画
-            Imgproc.rectangle(inputImage, expandedBoundingRect.tl(), expandedBoundingRect.br(), new Scalar(0, 255, 255), 2);
+        //補正確認用コード
+        // 画面中央の中心座標を取得
+        int centerX = inputImage.cols() / 2;
+        int centerY = inputImage.rows() / 2;
 
-            // マーカーの中心点のHSV値を取得
-            Mat centerHSV = new Mat();
-            Imgproc.cvtColor(inputImage, centerHSV, Imgproc.COLOR_RGB2HSV);
-            Scalar centerHSVValue = new Scalar(centerHSV.get((int) center_correction.y, (int) center_correction.x));
-            centerHSV.release();
-            Log.d("MarkerHSV", "中心のHSV値: " + centerHSVValue.toString());
-
-            // 基準HSV値（青マーカーの中心座標のHSV値）を設定
-            Scalar baseHSV = new Scalar(110, 255, 120); // 例: [H, S, V]
-            // HSV値の差分を計算（SとVの差分のみ）
-            Scalar correctionHSV = new Scalar(
-                    0, // Hは補正しない
-                    centerHSVValue.val[1] - baseHSV.val[1],
-                    centerHSVValue.val[2] - baseHSV.val[2]
-            );
-
-            // HSVの補正
-            for (int row = 0; row < hsvImage_input.rows(); row++) {
-                for (int col = 0; col < hsvImage_input.cols(); col++) {
-                    double[] hsvValue = hsvImage_input.get(row, col);
-                    // Hはそのまま、SとVだけ補正を適用
-                    hsvValue[1] += correctionHSV.val[1];
-                    hsvValue[2] += correctionHSV.val[2];
-                    // 範囲を保持するために値をクランプする
-                    hsvValue[1] = Math.max(0, Math.min(255, hsvValue[1]));
-                    hsvValue[2] = Math.max(0, Math.min(255, hsvValue[2]));
-                    hsvImage_input.put(row, col, hsvValue);
-                }
-            }
-
-            double[] centerHSVValuesAfter = hsvImage_input.get((int)center_correction.y, (int)center_correction.x);
-            Scalar centerHSVValueAfter = new Scalar(centerHSVValuesAfter);
-            Log.d("MarkerHSV", "補正後の中心のHSV値: " + centerHSVValueAfter.toString());
+        double[] centerHSVValueArrayBefore = hsvImage_input.get(centerY, centerX);
+        Scalar centerHSVValueBefore = new Scalar(centerHSVValueArrayBefore);
+        Log.d("MarkerHSV", "補正前の中心のHSV値: " + centerHSVValueBefore.toString());
 
 
 
 
-        }
-
-
+//
+//        //-------------------補正用マーカー取得---------------
+//        Mat maskMarker = new Mat();
+//        //青色マーカー抽出
+//        Scalar lowerBlue = new Scalar(100, 150, 0);
+//        Scalar upperBlue = new Scalar(140, 255, 255);
+//        Core.inRange(hsvImage_input, lowerBlue, upperBlue, maskMarker);
+//        // 輪郭抽出
+//        List<MatOfPoint> contours_correction = new ArrayList<>();
+//        Mat hierarchy_correction = new Mat();
+//        Imgproc.findContours(maskMarker, contours_correction, hierarchy_correction, Imgproc.RETR_EXTERNAL, Imgproc.CHAIN_APPROX_SIMPLE);
+//        // 最大の輪郭を見つける（円形度が0.9以上のものを対象）
+//        double maxArea = 0;
+//        MatOfPoint largestContour = null;
+//        for (MatOfPoint contour : contours_correction) {
+//            double area = Imgproc.contourArea(contour);
+//            double circularity = calculateCircularity(contour); // 円形度を計算
+//            if (area > maxArea && circularity >= 0.9) {
+//                maxArea = area;
+//                largestContour = contour;
+//            }
+//        }
+//        // 最大の輪郭の中心座標を計算
+//        Point center_correction = new Point();
+//        if (largestContour != null) {
+//            //中心座標の取得
+//            Rect boundingRect = Imgproc.boundingRect(largestContour);
+//            center_correction.x = boundingRect.x + boundingRect.width / 2;
+//            center_correction.y = boundingRect.y + boundingRect.height / 2;
+//
+//            // マーカーの矩形領域を描画
+//            // バウンディングボックスを一回り大きくする
+//            int increase = 10; // 10ピクセルずつ増やす
+//            int x = Math.max(boundingRect.x - increase, 0);
+//            int y = Math.max(boundingRect.y - increase, 0);
+//            int width = boundingRect.width + 2 * increase;
+//            int height = boundingRect.height + 2 * increase;
+//            // 画像の境界を越えないように調整
+//            width = Math.min(width, inputImage.cols() - x);
+//            height = Math.min(height, inputImage.rows() - y);
+//            // 拡大されたバウンディングボックス
+//            Rect expandedBoundingRect = new Rect(x, y, width, height);
+//            // マーカーの矩形領域を描画
+//            Imgproc.rectangle(inputImage, expandedBoundingRect.tl(), expandedBoundingRect.br(), new Scalar(0, 255, 255), 2);
+//
+//            // マーカーの中心点のHSV値を取得
+//            Mat centerHSV = new Mat();
+//            Imgproc.cvtColor(inputImage, centerHSV, Imgproc.COLOR_RGB2HSV);
+//            Scalar centerHSVValue = new Scalar(centerHSV.get((int) center_correction.y, (int) center_correction.x));
+//            centerHSV.release();
+////            Log.d("MarkerHSV", "中心のHSV値: " + centerHSVValue.toString());
+//
+//            // 基準HSV値（青マーカーの中心座標のHSV値）を設定
+//            Scalar baseHSV = new Scalar(110, 255, 120); // 例: [H, S, V]
+//            // HSV値の差分を計算（SとVの差分のみ）
+//
+//            double sDiff = centerHSVValue.val[1] - baseHSV.val[1];
+//            double vDiff = centerHSVValue.val[2] - baseHSV.val[2];
+//
+//            Scalar correctionHSV = new Scalar(
+//                    0, // Hは補正しない
+//                    centerHSVValue.val[1] - baseHSV.val[1],
+//                    centerHSVValue.val[2] - baseHSV.val[2]
+//            );
+//
+//            // HSVの補正
+//            for (int row = 0; row < hsvImage_input.rows(); row++) {
+//                for (int col = 0; col < hsvImage_input.cols(); col++) {
+//                    double[] hsvValue = hsvImage_input.get(row, col);
+//                    // Hはそのまま、SとVだけ補正を適用
+//
+//                    // Sの補正
+//                    if (sDiff > 0) {
+//                        hsvValue[1] -= Math.abs(sDiff);
+//                    } else {
+//                        hsvValue[1] += Math.abs(sDiff);
+//                    }
+//                    //Vの補正
+//                    if (vDiff > 0){
+//                        hsvValue[2] -= correctionHSV.val[2];
+//                    }
+//                    else {
+//                        hsvValue[2] += correctionHSV.val[2];
+//                    }
+//                    // 範囲を保持するために値をクランプする
+//                    hsvValue[1] = Math.max(0, Math.min(255, hsvValue[1]));
+//                    hsvValue[2] = Math.max(0, Math.min(255, hsvValue[2]));
+//                    hsvImage_input.put(row, col, hsvValue);
+//                }
+//            }
+//
+//            double[] centerHSVValuesAfter = hsvImage_input.get((int)center_correction.y, (int)center_correction.x);
+//            Scalar centerHSVValueAfter = new Scalar(centerHSVValuesAfter);
+////            Log.d("MarkerHSV", "補正後の中心のHSV値: " + centerHSVValueAfter.toString());
+//
+//
+//        }
+//        // 補正後の中心のHSV値を取得
+//
+//        double[] centerHSVValueArrayAfter = hsvImage_input.get(centerY, centerX);
+//        Scalar centerHSVValueAfter = new Scalar(centerHSVValueArrayAfter);
+//        Log.d("MarkerHSV", "補正後の中心のHSV値: " + centerHSVValueAfter.toString());
+//
+////        マーカー補正終了
 
 
 
@@ -342,10 +375,15 @@ public class MainActivity extends CameraActivity implements CameraBridgeViewBase
         //inputimage
         Core.inRange(hsvImage_input,marker_lower, marker_higher,mask_maker);
 
+        Mat maskWhite_st = new Mat();
+        Scalar wh_st_lowerBound = new Scalar(0, 50, 50);//本物(20, 11, 150)　　レプリカ(20, 29, 103)
+        Scalar wh_st_upperBound = new Scalar(30, 255, 255);//本物(40, 199, 255)　レプリカ(60, 137, 255)
+        Core.inRange(hsvImage_input, wh_st_lowerBound , wh_st_upperBound, maskWhite_st);
+
         // いちごの緑
         Mat maskGreen_st = new Mat();
         Scalar gr_st_lowerBound = new Scalar(20, 29, 103);//本物(20, 11, 150)　　レプリカ(20, 29, 103)
-        Scalar gr_st_upperBound = new Scalar(50, 255, 255);//本物(40, 199, 255)　レプリカ(60, 137, 255)
+        Scalar gr_st_upperBound = new Scalar(30, 255, 255);//本物(40, 199, 255)　レプリカ(60, 137, 255)
         Core.inRange(hsvImage_input, gr_st_lowerBound , gr_st_upperBound, maskGreen_st);
         //いちごの緑（境界）
         Mat maskGreen_border = new Mat();
@@ -353,7 +391,10 @@ public class MainActivity extends CameraActivity implements CameraBridgeViewBase
         Scalar gr_border_upperBound = new Scalar(20,255,255);//本物(20, 251,255)　　レプリカ(20,255,255)
         Core.inRange(hsvImage_input, gr_border_lowerBound, gr_border_upperBound, maskGreen_border);
         //maskGreen_stとmaskGreen_borderを合わせる
+
         Core.bitwise_or(maskGreen_st, maskGreen_border,maskGreen);
+        //white用
+        Core.bitwise_or(maskWhite_st, maskGreen,maskGreen);
 
         //maskRedとmaskGreenをあわせてmaskStrawberryを作成
         Core.bitwise_or(maskRed, maskGreen, maskStrawberry);
@@ -498,6 +539,7 @@ public class MainActivity extends CameraActivity implements CameraBridgeViewBase
         Mat resultRed = Mat.zeros(maskRed_find.size(), CvType.CV_8U);
         Mat resultMark = Mat.zeros(mask_maker.size(), CvType.CV_8U);
 
+
         Imgproc.drawContours(resultStrawberry, filteredContoursStrawberry, -1, new Scalar(255), Core.FILLED);
         Imgproc.drawContours(resultRed, filteredContoursRed, -1, new Scalar(255), Core.FILLED);
         Imgproc.drawContours(resultMark, filteredContoursMark, -1, new Scalar(255), Core.FILLED);
@@ -574,11 +616,11 @@ public class MainActivity extends CameraActivity implements CameraBridgeViewBase
                 }
                 else if (predict_time_dif > 0 && ratio != 0){
                     predictTextView.setText(String.valueOf(predict_time_hour)+"時間"+String.valueOf(predict_time_minutes)+"分後");
-                    targetsize.setText(String.valueOf(finalPredict_Size)+"cm");
+                    targetsize.setText(String.valueOf(finalPredict_Size)+"cm^2");
                 }
                 else{
                     predictTextView.setText("収穫可能");
-                    targetsize.setText(String.valueOf(finalPredict_Size)+"cm");
+                    targetsize.setText(String.valueOf(finalPredict_Size)+"cm^2");
                 }
 
 
@@ -628,6 +670,8 @@ public class MainActivity extends CameraActivity implements CameraBridgeViewBase
         // 画像を表示////
         return inputImage;
         //return resultStrawberry;
+        //return maskGreen;
+        //return maskWhite_st;
         //return mask_maker;
 
 
