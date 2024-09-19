@@ -14,6 +14,7 @@ import android.view.MenuItem;
 import android.view.SurfaceView;
 import android.view.View;
 import android.view.WindowManager;
+import android.widget.Button;
 import android.widget.TextView;
 
 import org.opencv.android.BaseLoaderCallback;
@@ -147,6 +148,16 @@ public class MainActivity extends CameraActivity implements CameraBridgeViewBase
                 finish();
             }
         });
+
+
+        // @+id/seni_button01_right のクリックリスナーを設定
+        Button settingsButton = findViewById(R.id.seni_button01_right);
+        settingsButton.setOnClickListener(v -> {
+            // Intentを使ってSettingActivityに遷移
+            Intent intent = new Intent(MainActivity.this, SettingActivity.class);
+            startActivity(intent);
+        });
+
 
     }
 
@@ -593,10 +604,10 @@ public class MainActivity extends CameraActivity implements CameraBridgeViewBase
         BigDecimal bd = new BigDecimal(ratio);
         BigDecimal ripe_ratio = bd.setScale(2,BigDecimal.ROUND_HALF_UP);
 
+        double slope_of_predict_line = 0.0199;
+        double predict_time_80 = 80.0 / slope_of_predict_line;
 
-        double predict_time_80 = 80.0 / 0.0199;
-
-        double predict_time = ratio / 0.0199;
+        double predict_time = ratio / slope_of_predict_line;
 
         int predict_time_dif =(int)(predict_time_80-predict_time);
 

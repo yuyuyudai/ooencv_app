@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".SettingActivity">
+
+    <!-- 画面全体の親ビュー -->
+    <LinearLayout
+        android:id="@+id/parent_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:gravity="center"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <!-- dr_lowerBound (HSV lower bound) -->
+        <TextView
+            android:id="@+id/lower_bound_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Lower Bound (HSV)"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            android:layout_margin="16dp"/>
+
+        <EditText
+            android:id="@+id/lower_bound_input_hue"
+            android:layout_width="170dp"
+            android:layout_height="wrap_content"
+            android:layout_margin="16dp"
+            android:hint="Hue"
+            android:textSize="24sp"
+            android:inputType="numberDecimal"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/lower_bound_label" />
+
+        <EditText
+            android:id="@+id/lower_bound_input_saturation"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:inputType="numberDecimal"
+            android:hint="Saturation"
+            android:textSize="24sp"
+            app:layout_constraintTop_toBottomOf="@+id/lower_bound_input_hue"
+            app:layout_constraintStart_toStartOf="parent"
+            android:layout_margin="16dp"/>
+
+        <EditText
+            android:id="@+id/lower_bound_input_value"
+            android:layout_width="182dp"
+            android:layout_height="wrap_content"
+            android:layout_margin="16dp"
+            android:hint="Value"
+            android:textSize="24sp"
+            android:inputType="numberDecimal"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/lower_bound_input_saturation" />
+
+        <!-- predict_size -->
+        <TextView
+            android:id="@+id/predict_size_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Predict Size"
+            app:layout_constraintTop_toBottomOf="@+id/lower_bound_input_value"
+            app:layout_constraintStart_toStartOf="parent"
+            android:layout_margin="16dp"/>
+
+        <EditText
+            android:id="@+id/predict_size_input"
+            android:layout_width="166dp"
+            android:layout_height="wrap_content"
+            android:layout_margin="16dp"
+            android:hint="Size"
+            android:textSize="24sp"
+            android:inputType="numberDecimal"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/predict_size_label" />
+
+        <!-- slope_of_predict_line -->
+        <TextView
+            android:id="@+id/slope_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Slope of Predict Line"
+            app:layout_constraintTop_toBottomOf="@+id/predict_size_input"
+            app:layout_constraintStart_toStartOf="parent"
+            android:layout_margin="16dp"/>
+
+        <EditText
+            android:id="@+id/slope_input"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:inputType="numberDecimal"
+            android:hint="Slope"
+            android:textSize="24sp"
+            app:layout_constraintTop_toBottomOf="@+id/slope_label"
+            app:layout_constraintStart_toStartOf="parent"
+            android:layout_margin="16dp"/>
+
+        <!-- 内部の親ビュー -->
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/inner_parent_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:gravity="center"
+        android:orientation="horizontal"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        tools:layout_editor_absoluteX="0dp"
+        tools:layout_editor_absoluteY="677dp">
+
+        <!-- 戻るボタン -->
+        <Button
+            android:id="@+id/back_button"
+            style="@android:style/Widget.Material.Light.Button.Toggle"
+            android:layout_width="142dp"
+            android:layout_height="50dp"
+            android:padding="5dp"
+            android:text="戻る" />
+
+    </LinearLayout>
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

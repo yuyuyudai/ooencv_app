@@ -165,19 +165,39 @@
         app:layout_constraintVertical_bias="0.0"
         android:gravity="center"/>
 
-    <Button
-        android:id="@+id/seni_button01"
-        style="@android:style/Widget.Material.Light.Button.Toggle"
-        android:layout_width="142dp"
-        android:layout_height="50dp"
-        android:padding="5dp"
-        android:text="ホームに戻る"
+    <!-- 新しい親ビュー (LinearLayout) を追加 -->
+    <LinearLayout
+        android:id="@+id/button_container"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.532"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.986" />
+        app:layout_constraintVertical_bias="0.986">
+
+        <!-- 最初のボタン -->
+        <Button
+            android:id="@+id/seni_button01"
+            style="@android:style/Widget.Material.Light.Button.Toggle"
+            android:layout_width="142dp"
+            android:layout_height="50dp"
+            android:padding="5dp"
+            android:text="ホームに戻る" />
+
+        <!-- 二番目のボタン -->
+        <Button
+            android:id="@+id/seni_button01_right"
+            style="@android:style/Widget.Material.Light.Button.Toggle"
+            android:layout_width="142dp"
+            android:layout_height="50dp"
+            android:padding="5dp"
+            android:text="設定" />
+    </LinearLayout>
+
+
+
 
 
 
