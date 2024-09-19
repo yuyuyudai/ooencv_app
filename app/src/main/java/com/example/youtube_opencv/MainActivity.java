@@ -4,6 +4,11 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Vibrator;
+import android.text.Spannable;
+import android.text.SpannableString;
+import android.text.SpannableStringBuilder;
+import android.text.style.RelativeSizeSpan;
+import android.text.style.SuperscriptSpan;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.SurfaceView;
@@ -499,9 +504,9 @@ public class MainActivity extends CameraActivity implements CameraBridgeViewBase
                 //イチゴ全体のマスクに円形度を入れると熟度が100を超えてしまう
                 //二値化画像の抽出の際に画面の中央に一番近いものを選択するプログラムを書く
                 //if(cercle > 0.6){
-                    filteredContoursStrawberry.add(contour);
-                    BoundingBox_strawberry(inputImage,contour);
-                    flag=true;
+                filteredContoursStrawberry.add(contour);
+                BoundingBox_strawberry(inputImage,contour);
+                flag=true;
 
                 //}
 
@@ -616,11 +621,57 @@ public class MainActivity extends CameraActivity implements CameraBridgeViewBase
                 }
                 else if (predict_time_dif > 0 && ratio != 0){
                     predictTextView.setText(String.valueOf(predict_time_hour)+"時間"+String.valueOf(predict_time_minutes)+"分後");
-                    targetsize.setText(String.valueOf(finalPredict_Size)+"cm^2");
+//                    targetsize.setText(String.valueOf(finalPredict_Size)+"cm^2");
+                    String sizeText = String.valueOf(finalPredict_Size);
+                    String baseText = "cm";
+                    String superscriptText = "2";
+
+// SpannableStringBuilderを使用してテキストを構築
+                    SpannableStringBuilder builder = new SpannableStringBuilder();
+                    builder.append(sizeText);
+                    builder.append(baseText);
+
+// 上付き文字部分をSpannableで作成
+                    SpannableString superscriptSpannable = new SpannableString(superscriptText);
+
+// 相対サイズを指定して上付き文字を小さくする (0.6fはサイズを60%に)
+                    superscriptSpannable.setSpan(new RelativeSizeSpan(0.6f), 0, superscriptText.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+
+// 上付き文字にする
+                    superscriptSpannable.setSpan(new SuperscriptSpan(), 0, superscriptText.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+
+// 上付き文字をbuilderに追加
+                    builder.append(superscriptSpannable);
+
+// TextViewにセット
+                    targetsize.setText(builder);
                 }
                 else{
                     predictTextView.setText("収穫可能");
-                    targetsize.setText(String.valueOf(finalPredict_Size)+"cm^2");
+//                    targetsize.setText(String.valueOf(finalPredict_Size)+"cm^2");
+                    String sizeText = String.valueOf(finalPredict_Size);
+                    String baseText = "cm";
+                    String superscriptText = "2";
+
+// SpannableStringBuilderを使用してテキストを構築
+                    SpannableStringBuilder builder = new SpannableStringBuilder();
+                    builder.append(sizeText);
+                    builder.append(baseText);
+
+// 上付き文字部分をSpannableで作成
+                    SpannableString superscriptSpannable = new SpannableString(superscriptText);
+
+// 相対サイズを指定して上付き文字を小さくする (0.6fはサイズを60%に)
+                    superscriptSpannable.setSpan(new RelativeSizeSpan(0.6f), 0, superscriptText.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+
+// 上付き文字にする
+                    superscriptSpannable.setSpan(new SuperscriptSpan(), 0, superscriptText.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+
+// 上付き文字をbuilderに追加
+                    builder.append(superscriptSpannable);
+
+// TextViewにセット
+                    targetsize.setText(builder);
                 }
 
 
