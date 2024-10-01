@@ -6,6 +6,8 @@
     android:layout_height="match_parent"
     tools:context=".SettingActivity">
 
+
+
     <!-- 画面全体の親ビュー -->
     <LinearLayout
         android:id="@+id/parent_view"
@@ -18,48 +20,70 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
 
-        <!-- dr_lowerBound (HSV lower bound) -->
-        <TextView
-            android:id="@+id/lower_bound_label"
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:id="@+id/lower_bound_section"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Lower Bound (HSV)"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            android:layout_margin="16dp"/>
+            android:orientation="vertical"
+            android:padding="16dp">
 
-        <EditText
-            android:id="@+id/lower_bound_input_hue"
-            android:layout_width="170dp"
-            android:layout_height="wrap_content"
-            android:layout_margin="16dp"
-            android:hint="Hue"
-            android:textSize="24sp"
-            android:inputType="numberDecimal"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/lower_bound_label" />
+            <!-- タップ可能なラベル -->
+            <TextView
+                android:id="@+id/lower_bound_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Lower Bound"
+                android:textSize="40sp"
+                android:clickable="true"
+                android:focusable="true" />
 
-        <EditText
-            android:id="@+id/lower_bound_input_saturation"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:inputType="numberDecimal"
-            android:hint="Saturation"
-            android:textSize="24sp"
-            app:layout_constraintTop_toBottomOf="@+id/lower_bound_input_hue"
-            app:layout_constraintStart_toStartOf="parent"
-            android:layout_margin="16dp"/>
+            <!-- 初期状態では非表示の詳細部分 -->
+            <LinearLayout
+                android:id="@+id/lower_bound_details"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:visibility="gone"
+                android:paddingTop="8dp">
 
-        <EditText
-            android:id="@+id/lower_bound_input_value"
-            android:layout_width="182dp"
-            android:layout_height="wrap_content"
-            android:layout_margin="16dp"
-            android:hint="Value"
-            android:textSize="24sp"
-            android:inputType="numberDecimal"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/lower_bound_input_saturation" />
+                <TextView
+                    android:id="@+id/lower_bound_hue_label"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Hue:" />
+                <EditText
+                    android:id="@+id/lower_bound_input_hue"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:inputType="numberDecimal" />
+
+                <TextView
+                    android:id="@+id/lower_bound_saturation_label"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Saturation:" />
+                <EditText
+                    android:id="@+id/lower_bound_input_saturation"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:inputType="numberDecimal" />
+
+                <TextView
+                    android:id="@+id/lower_bound_value_label"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Value:" />
+                <EditText
+                    android:id="@+id/lower_bound_input_value"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:inputType="numberDecimal" />
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <!-- 同じようにpredict_sizeとslopeのセクションを追加 -->
+
 
         <!-- predict_size -->
         <TextView
@@ -104,6 +128,17 @@
             android:layout_margin="16dp"/>
 
         <!-- 内部の親ビュー -->
+
+        <Button
+            android:id="@+id/save_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Save"
+            app:layout_constraintTop_toBottomOf="@+id/slope_input"
+            app:layout_constraintStart_toStartOf="parent"
+            android:layout_margin="16dp"/>
+
+
 
     </LinearLayout>
 
