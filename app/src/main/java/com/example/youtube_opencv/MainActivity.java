@@ -2,6 +2,7 @@ package com.example.youtube_opencv;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Vibrator;
 import android.text.Spannable;
@@ -46,6 +47,8 @@ public class MainActivity extends CameraActivity implements CameraBridgeViewBase
     public TextView pixelCountTextView;
     public TextView predictTextView;
     public TextView targetsize;
+
+    public TextView Size;
     public TextView coloredText_overripe;
     public TextView coloredBox_harf;
     public TextView coloredBox_ripe;
@@ -128,6 +131,7 @@ public class MainActivity extends CameraActivity implements CameraBridgeViewBase
         pixelCountTextView = (TextView)findViewById(R.id.pixelsInMask1str);//熟度のid
         predictTextView = (TextView)findViewById(R.id.predict);//予測時間のid
         targetsize = (TextView)findViewById(R.id.targetsize);
+        Size = (TextView)findViewById(R.id.Size);
         coloredText_overripe = findViewById(R.id.color_box_overripe_text);
         coloredBox_harf = findViewById(R.id.color_box_harf);
         coloredBox_ripe = findViewById(R.id.color_box_ripe);
@@ -617,22 +621,48 @@ public class MainActivity extends CameraActivity implements CameraBridgeViewBase
 
 
 
+        //サイズ（S,M,L）表示
+//        int Sizethreshold_S_M = 10;
+//        int Sizethreshold_M_L = 20;
+
+        SharedPreferences sharedPref = getSharedPreferences("AppSettings", MODE_PRIVATE);
+        int Sizethreshold_S_M = sharedPref.getInt("Sizethreshold_S_M", 10);  // デフォルト値10
+        int Sizethreshold_M_L = sharedPref.getInt("Sizethreshold_M_L", 20);  // デフォルト値20
+
+
 
         runOnUiThread(new Runnable(){
 
             @Override
             public void run() {
+
+
+
+
                 pixelCountTextView.setText(String.valueOf(ripe_ratio)+"%");
 
 
                 if(predict_time_dif > 0 && ratio == 0){
                     predictTextView.setText(String.valueOf(""));
+                    Size.setText(String.valueOf(""));
                     targetsize.setText(String.valueOf(""));
 
                 }
                 else if (predict_time_dif > 0 && ratio != 0){
                     predictTextView.setText(String.valueOf(predict_time_hour)+"時間"+String.valueOf(predict_time_minutes)+"分後");
-//                    targetsize.setText(String.valueOf(finalPredict_Size)+"cm^2");
+
+                    //サイズ表示（S,M,L）
+                    if(finalPredict_Size < Sizethreshold_S_M){
+                        Size.setText("S");
+                    }
+                    else if (Sizethreshold_S_M <= finalPredict_Size && finalPredict_Size <= Sizethreshold_M_L){
+                        Size.setText("M");
+                    }
+                    else{
+                        Size.setText("L");
+                    }
+
+                    //表面積表示
                     String sizeText = String.valueOf(finalPredict_Size);
                     String baseText = "cm";
                     String superscriptText = "2";
@@ -659,7 +689,20 @@ public class MainActivity extends CameraActivity implements CameraBridgeViewBase
                 }
                 else{
                     predictTextView.setText("収穫可能");
-//                    targetsize.setText(String.valueOf(finalPredict_Size)+"cm^2");
+
+
+                    //サイズ表示（S,M,L）
+                    if(finalPredict_Size < Sizethreshold_S_M){
+                        Size.setText("S");
+                    }
+                    else if (Sizethreshold_S_M <= finalPredict_Size && finalPredict_Size <= Sizethreshold_M_L){
+                        Size.setText("M");
+                    }
+                    else{
+                        Size.setText("L");
+                    }
+
+                    //表面積表示
                     String sizeText = String.valueOf(finalPredict_Size);
                     String baseText = "cm";
                     String superscriptText = "2";

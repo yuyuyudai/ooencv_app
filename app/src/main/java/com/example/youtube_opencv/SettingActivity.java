@@ -19,10 +19,18 @@ public class SettingActivity extends AppCompatActivity {
     private double predict_size;
     private double slope_of_predict_line;
 
+    private int Sizethreshold_S_M;
+    private int Sizethreshold_M_L;
+
     private EditText lowerBoundHueInput;
     private EditText lowerBoundSaturationInput;
     private EditText lowerBoundValueInput;
     private EditText predictSizeInput;
+
+    private EditText sizethresholdSMInput;
+    private EditText sizethresholdMLInput;
+    private LinearLayout sizeThresholdDetails; // 詳細セクションのレイアウト
+
     private EditText slopeInput;
 
     @Override
@@ -36,6 +44,8 @@ public class SettingActivity extends AppCompatActivity {
         lowerBoundValueInput = findViewById(R.id.lower_bound_input_value);
         predictSizeInput = findViewById(R.id.predict_size_input);
         slopeInput = findViewById(R.id.slope_input);
+        sizethresholdSMInput = findViewById(R.id.sizethreshold_s_m_input);
+        sizethresholdMLInput = findViewById(R.id.sizethreshold_m_l_input);
 
 
         // SharedPreferencesからデータを読み込む
@@ -45,6 +55,8 @@ public class SettingActivity extends AppCompatActivity {
         float savedValue = sharedPref.getFloat("dr_lowerBound_3", 78);
         float savedPredictSize = sharedPref.getFloat("predict_size", 0.0f);
         float savedSlope = sharedPref.getFloat("slope_of_predict_line", 0.0199f);
+        int defaultThresholdSM = sharedPref.getInt("Sizethreshold_S_M", 10);  // デフォルト値は10
+        int defaultThresholdML = sharedPref.getInt("Sizethreshold_M_L", 20);  // デフォルト値は20
 
 
         // 保存した値をEditTextに表示
@@ -53,13 +65,30 @@ public class SettingActivity extends AppCompatActivity {
         lowerBoundValueInput.setText(String.valueOf(savedValue));
         predictSizeInput.setText(String.valueOf(savedPredictSize));
         slopeInput.setText(String.valueOf(savedSlope));
+        sizethresholdSMInput.setText(String.valueOf(defaultThresholdSM));
+        sizethresholdMLInput.setText(String.valueOf(defaultThresholdML));
 
-        // 各セクションのレイアウトとラベルを取得
+        // lowerBoundDetailsのセクションの設定
         final LinearLayout lowerBoundDetails = findViewById(R.id.lower_bound_details);
         TextView lowerBoundLabel = findViewById(R.id.lower_bound_label);
 
+        // predict_sizeセクションの設定
+        final LinearLayout predictSizeDetails = findViewById(R.id.predict_size_details);
+        TextView predictSizeLabel = findViewById(R.id.predict_size_label);
+
+        // slopeセクションの設定
+        final LinearLayout slopeDetails = findViewById(R.id.slope_details);
+        TextView slopeLabel = findViewById(R.id.slope_label);
+
+        // 詳細セクションのIDを取得
+        final LinearLayout sizeThresholdDetails = findViewById(R.id.size_threshold_details);
+        TextView sizeLabel = findViewById(R.id.size_threshold_title);
+
+
         // 初期は詳細部分を隠す設定
         lowerBoundDetails.setVisibility(View.GONE);
+        predictSizeDetails.setVisibility(View.GONE);
+        slopeDetails.setVisibility(View.GONE);
 
         // Lower Boundラベルのクリックで詳細を表示/非表示
         lowerBoundLabel.setOnClickListener(new View.OnClickListener() {
@@ -70,8 +99,47 @@ public class SettingActivity extends AppCompatActivity {
                 } else {
                     lowerBoundDetails.setVisibility(View.GONE);
                 }
+
+
             }
         });
+
+        // Predict Sizeラベルのクリックで詳細を表示/非表示
+        predictSizeLabel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (predictSizeDetails.getVisibility() == View.GONE) {
+                    predictSizeDetails.setVisibility(View.VISIBLE);
+                } else {
+                    predictSizeDetails.setVisibility(View.GONE);
+                }
+            }
+        });
+
+        // Slopeラベルのクリックで詳細を表示/非表示
+        slopeLabel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (slopeDetails.getVisibility() == View.GONE) {
+                    slopeDetails.setVisibility(View.VISIBLE);
+                } else {
+                    slopeDetails.setVisibility(View.GONE);
+                }
+            }
+        });
+
+        sizeLabel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (sizeThresholdDetails.getVisibility() == View.GONE) {
+                    sizeThresholdDetails.setVisibility(View.VISIBLE);
+                } else {
+                    sizeThresholdDetails.setVisibility(View.GONE);
+                }
+            }
+        });
+
+
 
 
         // 設定画面で保存ボタンを押したときの処理
@@ -97,13 +165,21 @@ public class SettingActivity extends AppCompatActivity {
 
     private void saveSettings() {
         // 入力された値を取得
+        //HSV
         double hue = Double.parseDouble(lowerBoundHueInput.getText().toString());
         double saturation = Double.parseDouble(lowerBoundSaturationInput.getText().toString());
         double value = Double.parseDouble(lowerBoundValueInput.getText().toString());
         dr_lowerBound = new Scalar(hue, saturation, value);
 
+        //表面積
         predict_size = Double.parseDouble(predictSizeInput.getText().toString());
+
+        //熟度予測直線
         slope_of_predict_line = Double.parseDouble(slopeInput.getText().toString());
+
+        //サイズの閾値
+        int newThresholdSM = Integer.parseInt(sizethresholdSMInput.getText().toString());
+        int newThresholdML = Integer.parseInt(sizethresholdMLInput.getText().toString());
 
         // 値の確認のためにToast表示（デバッグ用）
 //        Toast.makeText(this, "Settings Saved", Toast.LENGTH_SHORT).show();
@@ -118,6 +194,8 @@ public class SettingActivity extends AppCompatActivity {
         editor.putFloat("dr_lowerBound_3", (float) value);
         editor.putFloat("predict_size", (float) predict_size);
         editor.putFloat("slope_of_predict_line", (float) slope_of_predict_line);
+        editor.putInt("Sizethreshold_S_M", newThresholdSM);
+        editor.putInt("Sizethreshold_M_L", newThresholdML);
 
         // 保存の確定
         editor.apply();

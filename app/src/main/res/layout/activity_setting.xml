@@ -20,6 +20,72 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
 
+
+        <LinearLayout
+            android:id="@+id/size_threshold_section"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp">
+
+            <!-- タイトル部分: S-MとM-Lのサイズ閾値を設定するセクション -->
+            <TextView
+                android:id="@+id/size_threshold_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="サイズの閾値変更"
+                android:textSize="40sp"
+                android:clickable="true"
+                android:focusable="true" />
+
+            <!-- 閾値の詳細入力部分（デフォルトで非表示） -->
+            <LinearLayout
+                android:id="@+id/size_threshold_details"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:visibility="gone"> <!-- 初期状態で非表示 -->
+
+                <!-- SとMのサイズを決める閾値 -->
+                <TextView
+                    android:id="@+id/sizethreshold_s_m_label"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="サイズ閾値変更 S-M"
+                    android:textSize="18sp"
+                    android:paddingBottom="8dp" />
+
+                <EditText
+                    android:id="@+id/sizethreshold_s_m_input"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="number"
+                    android:hint="Enter threshold value for S-M" />
+
+                <!-- MとLのサイズを決める閾値 -->
+                <TextView
+                    android:id="@+id/sizethreshold_m_l_label"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="サイズ閾値変更 M-L"
+                    android:textSize="18sp"
+                    android:paddingBottom="8dp"
+                    android:paddingTop="16dp" />
+
+                <EditText
+                    android:id="@+id/sizethreshold_m_l_input"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="number"
+                    android:hint="Enter threshold value for M-L" />
+
+            </LinearLayout>
+        </LinearLayout>
+
+
+
+
+
         <LinearLayout
             android:id="@+id/lower_bound_section"
             android:layout_width="match_parent"
@@ -85,47 +151,89 @@
         <!-- 同じようにpredict_sizeとslopeのセクションを追加 -->
 
 
-        <!-- predict_size -->
-        <TextView
-            android:id="@+id/predict_size_label"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Predict Size"
-            app:layout_constraintTop_toBottomOf="@+id/lower_bound_input_value"
-            app:layout_constraintStart_toStartOf="parent"
-            android:layout_margin="16dp"/>
 
-        <EditText
-            android:id="@+id/predict_size_input"
-            android:layout_width="166dp"
+        <LinearLayout
+            android:id="@+id/predict_size_section"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="16dp"
-            android:hint="Size"
-            android:textSize="24sp"
-            android:inputType="numberDecimal"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/predict_size_label" />
+            android:orientation="vertical"
+            android:padding="16dp">
 
-        <!-- slope_of_predict_line -->
-        <TextView
-            android:id="@+id/slope_label"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Slope of Predict Line"
-            app:layout_constraintTop_toBottomOf="@+id/predict_size_input"
-            app:layout_constraintStart_toStartOf="parent"
-            android:layout_margin="16dp"/>
+            <!-- タップ可能なラベル -->
+            <TextView
+                android:id="@+id/predict_size_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Predict Size"
+                android:textSize="40sp"
+                android:clickable="true"
+                android:focusable="true" />
 
-        <EditText
-            android:id="@+id/slope_input"
-            android:layout_width="wrap_content"
+            <!-- 初期状態では非表示の詳細部分 -->
+            <LinearLayout
+                android:id="@+id/predict_size_details"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:visibility="gone"
+                android:paddingTop="8dp">
+
+                <TextView
+                    android:id="@+id/predict_size_input_label"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Predict Size:" />
+
+                <EditText
+                    android:id="@+id/predict_size_input"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:inputType="numberDecimal" />
+            </LinearLayout>
+
+        </LinearLayout>
+
+
+        <LinearLayout
+            android:id="@+id/slope_section"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:inputType="numberDecimal"
-            android:hint="Slope"
-            android:textSize="24sp"
-            app:layout_constraintTop_toBottomOf="@+id/slope_label"
-            app:layout_constraintStart_toStartOf="parent"
-            android:layout_margin="16dp"/>
+            android:orientation="vertical"
+            android:padding="16dp">
+
+            <!-- タップ可能なラベル -->
+            <TextView
+                android:id="@+id/slope_label"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Slope"
+                android:textSize="40sp"
+                android:clickable="true"
+                android:focusable="true" />
+
+            <!-- 初期状態では非表示の詳細部分 -->
+            <LinearLayout
+                android:id="@+id/slope_details"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:visibility="gone"
+                android:paddingTop="8dp">
+
+                <TextView
+                    android:id="@+id/slope_input_label"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Slope:" />
+
+                <EditText
+                    android:id="@+id/slope_input"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:inputType="numberDecimal" />
+            </LinearLayout>
+
+        </LinearLayout>
 
         <!-- 内部の親ビュー -->
 
