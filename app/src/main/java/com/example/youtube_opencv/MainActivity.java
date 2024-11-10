@@ -49,6 +49,7 @@ public class MainActivity extends CameraActivity implements CameraBridgeViewBase
     public TextView targetsize;
 
     public TextView Size;
+    public TextView Weight;
     public TextView coloredText_overripe;
     public TextView coloredBox_harf;
     public TextView coloredBox_ripe;
@@ -132,6 +133,7 @@ public class MainActivity extends CameraActivity implements CameraBridgeViewBase
         predictTextView = (TextView)findViewById(R.id.predict);//予測時間のid
         targetsize = (TextView)findViewById(R.id.targetsize);
         Size = (TextView)findViewById(R.id.Size);
+        Weight = (TextView)findViewById(R.id.Weight);
         coloredText_overripe = findViewById(R.id.color_box_overripe_text);
         coloredBox_harf = findViewById(R.id.color_box_harf);
         coloredBox_ripe = findViewById(R.id.color_box_ripe);
@@ -620,14 +622,22 @@ public class MainActivity extends CameraActivity implements CameraBridgeViewBase
         int predict_time_minutes = predict_time_dif % 60;
 
 
+        float initialDisplayValue_SM = 3.0f;
+        float initialDisplayValue_ML = 5.0f;
 
-        //サイズ（S,M,L）表示
-//        int Sizethreshold_S_M = 10;
-//        int Sizethreshold_M_L = 20;
+        int initialProgress_SM = (int)(initialDisplayValue_SM*10);
+        int initialProgress_ML = (int)(initialDisplayValue_ML*10);
 
+        //サイズ（S,M,L)
         SharedPreferences sharedPref = getSharedPreferences("AppSettings", MODE_PRIVATE);
-        int Sizethreshold_S_M = sharedPref.getInt("Sizethreshold_S_M", 10);  // デフォルト値10
-        int Sizethreshold_M_L = sharedPref.getInt("Sizethreshold_M_L", 20);  // デフォルト値20
+        int Sizethreshold_S_M = sharedPref.getInt("Sizethreshold_S_M", initialProgress_SM);  // デフォルト値10
+        int Sizethreshold_M_L = sharedPref.getInt("Sizethreshold_M_L", initialProgress_ML);  // デフォルト値20
+
+
+        //イチゴの重さ推定のための変数
+        float weightPredictionFactor = sharedPref.getFloat("weight_prediction_factor", 3.0f); //デフォルト値3.0
+        final double weight = finalPredict_Size * weightPredictionFactor;
+        String formattedWeight = String.format("%.2f", weight);
 
 
 
@@ -645,10 +655,12 @@ public class MainActivity extends CameraActivity implements CameraBridgeViewBase
                 if(predict_time_dif > 0 && ratio == 0){
                     predictTextView.setText(String.valueOf(""));
                     Size.setText(String.valueOf(""));
+                    Weight.setText(String.valueOf(""));
                     targetsize.setText(String.valueOf(""));
 
                 }
                 else if (predict_time_dif > 0 && ratio != 0){
+                    //予測時間表示
                     predictTextView.setText(String.valueOf(predict_time_hour)+"時間"+String.valueOf(predict_time_minutes)+"分後");
 
                     //サイズ表示（S,M,L）
@@ -661,6 +673,10 @@ public class MainActivity extends CameraActivity implements CameraBridgeViewBase
                     else{
                         Size.setText("L");
                     }
+
+                    //重さ表示
+                    Weight.setText(String.valueOf(formattedWeight)+"g");
+
 
                     //表面積表示
                     String sizeText = String.valueOf(finalPredict_Size);
@@ -701,6 +717,9 @@ public class MainActivity extends CameraActivity implements CameraBridgeViewBase
                     else{
                         Size.setText("L");
                     }
+
+                    //重さ表示
+                    Weight.setText(String.valueOf(formattedWeight)+"g");
 
                     //表面積表示
                     String sizeText = String.valueOf(finalPredict_Size);
