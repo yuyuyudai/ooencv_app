@@ -622,21 +622,26 @@ public class MainActivity extends CameraActivity implements CameraBridgeViewBase
         int predict_time_minutes = predict_time_dif % 60;
 
 
-        float initialDisplayValue_SM = 3.0f;
-        float initialDisplayValue_ML = 5.0f;
+        //初期表示値
+        int initialDisplayValue_SM = 30;
+        int initialDisplayValue_ML = 50;
+        int initialDisplayValue_weight = 30;
 
-        int initialProgress_SM = (int)(initialDisplayValue_SM*10);
-        int initialProgress_ML = (int)(initialDisplayValue_ML*10);
-
+        // プリファレンスから取得（スケール済み整数値として保存）
         //サイズ（S,M,L)
         SharedPreferences sharedPref = getSharedPreferences("AppSettings", MODE_PRIVATE);
-        int Sizethreshold_S_M = sharedPref.getInt("Sizethreshold_S_M", initialProgress_SM);  // デフォルト値10
-        int Sizethreshold_M_L = sharedPref.getInt("Sizethreshold_M_L", initialProgress_ML);  // デフォルト値20
+        int Sizethreshold_S_M = sharedPref.getInt("Sizethreshold_S_M", initialDisplayValue_SM);
+        int Sizethreshold_M_L = sharedPref.getInt("Sizethreshold_M_L", initialDisplayValue_ML);
+        //weight
+        int weightPredictionFactor = sharedPref.getInt("weightPredictionFactor", initialDisplayValue_weight);
 
+        // 必要な箇所で元のfloat値に戻す
+        float smValue = Sizethreshold_S_M / 10.0f;
+        float mlValue = Sizethreshold_M_L / 10.0f;
+        float weightFactor = weightPredictionFactor / 10.0f;
 
         //イチゴの重さ推定のための変数
-        float weightPredictionFactor = sharedPref.getFloat("weight_prediction_factor", 3.0f); //デフォルト値3.0
-        final double weight = finalPredict_Size * weightPredictionFactor;
+        final double weight = finalPredict_Size * weightFactor;
         String formattedWeight = String.format("%.2f", weight);
 
 
@@ -664,10 +669,10 @@ public class MainActivity extends CameraActivity implements CameraBridgeViewBase
                     predictTextView.setText(String.valueOf(predict_time_hour)+"時間"+String.valueOf(predict_time_minutes)+"分後");
 
                     //サイズ表示（S,M,L）
-                    if(finalPredict_Size < Sizethreshold_S_M){
+                    if(finalPredict_Size < smValue){
                         Size.setText("S");
                     }
-                    else if (Sizethreshold_S_M <= finalPredict_Size && finalPredict_Size <= Sizethreshold_M_L){
+                    else if (smValue <= finalPredict_Size && finalPredict_Size <= mlValue ){
                         Size.setText("M");
                     }
                     else{
@@ -708,10 +713,10 @@ public class MainActivity extends CameraActivity implements CameraBridgeViewBase
 
 
                     //サイズ表示（S,M,L）
-                    if(finalPredict_Size < Sizethreshold_S_M){
+                    if(finalPredict_Size < smValue){
                         Size.setText("S");
                     }
-                    else if (Sizethreshold_S_M <= finalPredict_Size && finalPredict_Size <= Sizethreshold_M_L){
+                    else if (smValue <= finalPredict_Size && finalPredict_Size <= mlValue ){
                         Size.setText("M");
                     }
                     else{
