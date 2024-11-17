@@ -3,6 +3,11 @@ package com.example.youtube_opencv;
 import androidx.appcompat.app.AppCompatActivity;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.text.Spannable;
+import android.text.SpannableString;
+import android.text.SpannableStringBuilder;
+import android.text.style.RelativeSizeSpan;
+import android.text.style.SuperscriptSpan;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -85,6 +90,38 @@ public class SettingActivity extends AppCompatActivity {
         float defaultWeight = sharedPref.getFloat("weightPredictionFactor", 3.0f);
 
 
+        String sizeText_SM = String.valueOf(defaultThresholdSM);
+        String sizeText_ML = String.valueOf(defaultThresholdML);
+
+        String baseText = "cm";
+        String superscriptText = "2";
+
+// SpannableStringBuilderを使用してテキストを構築
+        SpannableStringBuilder builder_SM = new SpannableStringBuilder();
+        SpannableStringBuilder builder_ML = new SpannableStringBuilder();
+        builder_SM.append(sizeText_SM);
+        builder_ML.append(sizeText_ML);
+        builder_SM.append(baseText);
+        builder_ML.append(baseText);
+
+// 上付き文字部分をSpannableで作成
+        SpannableString superscriptSpannable = new SpannableString(superscriptText);
+
+// 相対サイズを指定して上付き文字を小さくする (0.6fはサイズを60%に)
+        superscriptSpannable.setSpan(new RelativeSizeSpan(0.6f), 0, superscriptText.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+
+// 上付き文字にする
+        superscriptSpannable.setSpan(new SuperscriptSpan(), 0, superscriptText.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+
+// 上付き文字をbuilderに追加
+        builder_SM.append(superscriptSpannable);
+        builder_ML.append(superscriptSpannable);
+
+
+
+
+
+
         // 保存した値をUIコンポーネントに表示
         lowerBoundHueInput.setText(String.valueOf(savedHue));
         lowerBoundSaturationInput.setText(String.valueOf(savedSaturation));
@@ -92,8 +129,8 @@ public class SettingActivity extends AppCompatActivity {
         slopeInput.setText(String.valueOf(savedSlope));
         sizethresholdSMSeekBar.setProgress(initialProgress_SM);
         sizethresholdMLSeekBar.setProgress(initialProgress_ML);
-        sizethresholdSMValue.setText(String.format("%.1f", defaultThresholdSM));
-        sizethresholdMLValue.setText(String.format("%.1f", defaultThresholdML));
+        sizethresholdSMValue.setText(builder_SM);
+        sizethresholdMLValue.setText(builder_ML);
         weightSeekBar.setProgress(initialProgress_Weight);
         weightValue.setText(String.format("%.1f", defaultWeight));
 
@@ -184,7 +221,30 @@ public class SettingActivity extends AppCompatActivity {
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                 // 0.1倍して0～10の範囲の値に変換
                 float displayedValue = progress / 10.0f;
-                sizethresholdSMValue.setText(String.format("%.1f", displayedValue));
+                //表面積表示
+                String sizeText = String.valueOf(displayedValue);
+                String baseText = "cm";
+                String superscriptText = "2";
+
+// SpannableStringBuilderを使用してテキストを構築
+                SpannableStringBuilder builder = new SpannableStringBuilder();
+                builder.append(sizeText);
+                builder.append(baseText);
+
+// 上付き文字部分をSpannableで作成
+                SpannableString superscriptSpannable = new SpannableString(superscriptText);
+
+// 相対サイズを指定して上付き文字を小さくする (0.6fはサイズを60%に)
+                superscriptSpannable.setSpan(new RelativeSizeSpan(0.6f), 0, superscriptText.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+
+// 上付き文字にする
+                superscriptSpannable.setSpan(new SuperscriptSpan(), 0, superscriptText.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+
+// 上付き文字をbuilderに追加
+                builder.append(superscriptSpannable);
+
+// TextViewにセット
+                sizethresholdSMValue.setText(builder);
             }
 
             @Override
@@ -199,7 +259,33 @@ public class SettingActivity extends AppCompatActivity {
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                 // 0.1倍して0～10の範囲の値に変換
                 float displayedValue = progress / 10.0f;
-                sizethresholdMLValue.setText(String.format("%.1f", displayedValue));
+
+                //表面積表示
+                String sizeText = String.valueOf(displayedValue);
+                String baseText = "cm";
+                String superscriptText = "2";
+
+// SpannableStringBuilderを使用してテキストを構築
+                SpannableStringBuilder builder = new SpannableStringBuilder();
+                builder.append(sizeText);
+                builder.append(baseText);
+
+// 上付き文字部分をSpannableで作成
+                SpannableString superscriptSpannable = new SpannableString(superscriptText);
+
+// 相対サイズを指定して上付き文字を小さくする (0.6fはサイズを60%に)
+                superscriptSpannable.setSpan(new RelativeSizeSpan(0.6f), 0, superscriptText.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+
+// 上付き文字にする
+                superscriptSpannable.setSpan(new SuperscriptSpan(), 0, superscriptText.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+
+// 上付き文字をbuilderに追加
+                builder.append(superscriptSpannable);
+
+// TextViewにセット
+                sizethresholdMLValue.setText(builder);
+
+
             }
 
             @Override

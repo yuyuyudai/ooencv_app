@@ -8,326 +8,349 @@
 
 
 
-    <!-- 画面全体の親ビュー -->
-    <LinearLayout
-        android:id="@+id/parent_view"
+    <!-- タイトル -->
+    <TextView
+        android:id="@+id/title_text"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
+        android:layout_height="70dp"
+        android:text="設定画面"
+        android:textSize="32sp"
+        android:textStyle="bold"
+        android:layout_marginTop="16dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
         android:gravity="center"
-        app:layout_constraintBottom_toBottomOf="parent"
+        android:textColor="#2b2b2b"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent">
+        app:layout_constraintEnd_toEndOf="parent"
+        android:background="#f5f5f5"/>
 
 
+    <!-- スクロール可能なビュー -->
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="100dp">
+
+
+
+        <!-- 画面全体の親ビュー -->
         <LinearLayout
-            android:id="@+id/size_threshold_section"
+            android:id="@+id/parent_view"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:padding="10dp">
-
-
-
-            <!-- タイトル部分 -->
-            <TextView
-                android:id="@+id/size_threshold_title"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="サイズ: (S,M,L)"
-                android:textSize="40sp"
-                android:clickable="true"
-                android:focusable="true"
-                android:textColor="#000000"
-                android:background="#c0c0c0"/>
-
-            <!-- サイズの視覚的ガイド -->
-            <LinearLayout
-                android:id="@+id/size_threshold_details"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:visibility="gone"
-                android:background="#2b2b2b">
-
-                <!-- 閾値のスライダー設定（S-M） -->
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="ここではサイズの閾値を設定できます。"
-                    android:textSize="18sp"
-                    android:paddingTop="16dp" />
-
-                <TextView
-                    android:id="@+id/sizethreshold_s_m_label"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="S-Mサイズの閾値"
-                    android:textSize="25sp"
-                    android:paddingTop="12dp" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="サイズのSとMの閾値を設定。"
-                    android:textSize="12sp"
-                    android:paddingTop="12dp" />
-
-                <SeekBar
-                    android:id="@+id/sizethreshold_s_m_seekbar"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:max="100"
-                    android:thumb="@drawable/custom_thumb" />
-
-                <TextView
-                    android:id="@+id/sizethreshold_s_m_value"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="現在の値: 10"
-                    android:paddingTop="8dp"
-                    android:textSize="25sp"/>
-
-                <!-- 閾値のスライダー設定（M-L） -->
-                <TextView
-                    android:id="@+id/sizethreshold_m_l_label"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="M-Lサイズの閾値"
-                    android:textSize="25sp"
-                    android:paddingTop="12dp" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="サイズのMとLの閾値を設定。"
-                    android:textSize="12sp"
-                    android:paddingTop="12dp" />
-
-                <SeekBar
-                    android:id="@+id/sizethreshold_m_l_seekbar"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:max="100"
-                    android:thumb="@drawable/custom_thumb" />
-
-                <TextView
-                    android:id="@+id/sizethreshold_m_l_value"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="現在の値: 20"
-                    android:paddingTop="8dp"
-                    android:textSize="25sp"/>
-            </LinearLayout>
-        </LinearLayout>
-
-
-
-        <LinearLayout
-            android:id="@+id/predict_weight_section"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:padding="10dp">
-
-            <!-- タップ可能なラベル -->
-            <TextView
-                android:id="@+id/predict_weight_label"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="重さ: (〇〇g)"
-                android:textSize="40sp"
-                android:clickable="true"
-                android:focusable="true"
-                android:textColor="#000000"
-                android:background="#c0c0c0"/>
-
-            <!-- 初期状態では非表示の詳細部分 -->
-            <LinearLayout
-                android:id="@+id/predict_weight_details"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:visibility="gone"
-                android:paddingTop="8dp"
-                android:background="#2b2b2b">
-
-
-                <!-- 閾値のスライダー設定（S-M） -->
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="ここでは重さの係数を設定できます。"
-                    android:textSize="18sp"
-                    android:paddingTop="16dp" />
-
-                <TextView
-                    android:id="@+id/weight_label"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="重さの係数"
-                    android:textSize="25sp"
-                    android:paddingTop="12dp" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="重さの係数を大きくすることで\n表面積あたりのいちごの重さを大きくすることができます。"
-                    android:textSize="12sp"
-                    android:paddingTop="12dp" />
-
-                <SeekBar
-                    android:id="@+id/weight_seekbar"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:max="100"
-                    android:thumb="@drawable/custom_thumb" />
-
-                <TextView
-                    android:id="@+id/weight_value"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="現在の値: 3.0"
-                    android:paddingTop="8dp"
-                    android:textSize="25sp"/>
-
-            </LinearLayout>
-
-        </LinearLayout>
-
-
-
-        <LinearLayout
-            android:id="@+id/lower_bound_section"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:padding="10dp">
-
-            <!-- タップ可能なラベル -->
-            <TextView
-                android:id="@+id/lower_bound_label"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="熟度: (〇〇%)"
-                android:textSize="40sp"
-                android:clickable="true"
-                android:focusable="true"
-                android:textColor="#000000"
-                android:background="#c0c0c0"/>
-
-            <!-- 初期状態では非表示の詳細部分 -->
-            <LinearLayout
-                android:id="@+id/lower_bound_details"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:visibility="gone"
-                android:paddingTop="8dp"
-                android:background="#2b2b2b">
-
-                <TextView
-                    android:id="@+id/lower_bound_hue_label"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Hue:" />
-                <EditText
-                    android:id="@+id/lower_bound_input_hue"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:inputType="numberDecimal" />
-
-                <TextView
-                    android:id="@+id/lower_bound_saturation_label"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Saturation:" />
-                <EditText
-                    android:id="@+id/lower_bound_input_saturation"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:inputType="numberDecimal" />
-
-                <TextView
-                    android:id="@+id/lower_bound_value_label"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Value:" />
-                <EditText
-                    android:id="@+id/lower_bound_input_value"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:inputType="numberDecimal" />
-            </LinearLayout>
-
-        </LinearLayout>
-
-        <!-- 同じようにpredict_sizeとslopeのセクションを追加 -->
-
-
-
-
-
-
-        <LinearLayout
-            android:id="@+id/slope_section"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:padding="10dp">
-
-            <!-- タップ可能なラベル -->
-            <TextView
-                android:id="@+id/slope_label"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:clickable="true"
-                android:focusable="true"
-                android:text="予測時間: (〇時間)"
-                android:textSize="40sp"
-                android:textColor="#000000"
-                android:background="#c0c0c0"/>
-
-            <!-- 初期状態では非表示の詳細部分 -->
-            <LinearLayout
-                android:id="@+id/slope_details"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:visibility="gone"
-                android:paddingTop="8dp"
-                android:background="#2b2b2b">
-
-                <TextView
-                    android:id="@+id/slope_input_label"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Slope:" />
-
-                <EditText
-                    android:id="@+id/slope_input"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:inputType="numberDecimal" />
-            </LinearLayout>
-
-        </LinearLayout>
-
-        <!-- 内部の親ビュー -->
-
-        <Button
-            android:id="@+id/save_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Save"
-            app:layout_constraintTop_toBottomOf="@+id/slope_input"
+            android:gravity="center"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            android:layout_margin="16dp"/>
+            app:layout_constraintEnd_toEndOf="parent">
+
+
+            <LinearLayout
+                android:id="@+id/size_threshold_section"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="10dp">
 
 
 
-    </LinearLayout>
+                <!-- タイトル部分 -->
+                <TextView
+                    android:id="@+id/size_threshold_title"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="サイズ: (S,M,L)"
+                    android:textStyle="bold"
+                    android:textSize="40sp"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:textColor="#000000"
+                    android:background="#c0c0c0"/>
+
+                <!-- サイズの視覚的ガイド -->
+                <LinearLayout
+                    android:id="@+id/size_threshold_details"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:visibility="gone"
+                    android:background="#2b2b2b">
+
+                    <!-- 閾値のスライダー設定（S-M） -->
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="ここではサイズの閾値を設定できます。"
+                        android:textSize="18sp"
+                        android:paddingTop="16dp" />
+
+                    <TextView
+                        android:id="@+id/sizethreshold_s_m_label"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="S-Mサイズの閾値"
+                        android:textSize="25sp"
+                        android:paddingTop="12dp" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="サイズのSとMの閾値を設定。"
+                        android:textSize="12sp"
+                        android:paddingTop="12dp" />
+
+                    <SeekBar
+                        android:id="@+id/sizethreshold_s_m_seekbar"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:max="100"
+                        android:thumb="@drawable/custom_thumb" />
+
+                    <TextView
+                        android:id="@+id/sizethreshold_s_m_value"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="現在の値: 10"
+                        android:paddingTop="8dp"
+                        android:textSize="25sp"/>
+
+                    <!-- 閾値のスライダー設定（M-L） -->
+                    <TextView
+                        android:id="@+id/sizethreshold_m_l_label"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="M-Lサイズの閾値"
+                        android:textSize="25sp"
+                        android:paddingTop="12dp" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="サイズのMとLの閾値を設定。"
+                        android:textSize="12sp"
+                        android:paddingTop="12dp" />
+
+                    <SeekBar
+                        android:id="@+id/sizethreshold_m_l_seekbar"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:max="100"
+                        android:thumb="@drawable/custom_thumb" />
+
+                    <TextView
+                        android:id="@+id/sizethreshold_m_l_value"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="現在の値: 20"
+                        android:paddingTop="8dp"
+                        android:textSize="25sp"/>
+                </LinearLayout>
+            </LinearLayout>
+
+
+
+            <LinearLayout
+                android:id="@+id/predict_weight_section"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="10dp">
+
+                <!-- タップ可能なラベル -->
+                <TextView
+                    android:id="@+id/predict_weight_label"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="重さ: (〇〇g)"
+                    android:textStyle="bold"
+                    android:textSize="40sp"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:textColor="#000000"
+                    android:background="#c0c0c0"/>
+
+                <!-- 初期状態では非表示の詳細部分 -->
+                <LinearLayout
+                    android:id="@+id/predict_weight_details"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:visibility="gone"
+                    android:paddingTop="8dp"
+                    android:background="#2b2b2b">
+
+
+                    <!-- 閾値のスライダー設定（S-M） -->
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="ここでは重さの係数を設定できます。"
+                        android:textSize="18sp"
+                        android:paddingTop="16dp" />
+
+                    <TextView
+                        android:id="@+id/weight_label"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="重さの係数"
+                        android:textSize="25sp"
+                        android:paddingTop="12dp" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="重さの係数を大きくすることで\n表面積あたりのいちごの重さを大きくすることができます。"
+                        android:textSize="12sp"
+                        android:paddingTop="12dp" />
+
+                    <SeekBar
+                        android:id="@+id/weight_seekbar"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:max="100"
+                        android:thumb="@drawable/custom_thumb" />
+
+                    <TextView
+                        android:id="@+id/weight_value"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="現在の値: 3.0"
+                        android:paddingTop="8dp"
+                        android:textSize="25sp"/>
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+
+
+            <LinearLayout
+                android:id="@+id/lower_bound_section"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="10dp">
+
+                <!-- タップ可能なラベル -->
+                <TextView
+                    android:id="@+id/lower_bound_label"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="熟度: (〇〇%)"
+                    android:textStyle="bold"
+                    android:textSize="40sp"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:textColor="#000000"
+                    android:background="#c0c0c0"/>
+
+                <!-- 初期状態では非表示の詳細部分 -->
+                <LinearLayout
+                    android:id="@+id/lower_bound_details"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:visibility="gone"
+                    android:paddingTop="8dp"
+                    android:background="#2b2b2b">
+
+                    <TextView
+                        android:id="@+id/lower_bound_hue_label"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Hue:" />
+                    <EditText
+                        android:id="@+id/lower_bound_input_hue"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:inputType="numberDecimal" />
+
+                    <TextView
+                        android:id="@+id/lower_bound_saturation_label"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Saturation:" />
+                    <EditText
+                        android:id="@+id/lower_bound_input_saturation"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:inputType="numberDecimal" />
+
+                    <TextView
+                        android:id="@+id/lower_bound_value_label"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Value:" />
+                    <EditText
+                        android:id="@+id/lower_bound_input_value"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:inputType="numberDecimal" />
+                </LinearLayout>
+
+            </LinearLayout>
+
+
+            <LinearLayout
+                android:id="@+id/slope_section"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="10dp">
+
+                <!-- タップ可能なラベル -->
+                <TextView
+                    android:id="@+id/slope_label"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:text="予測時間: (〇時間)"
+                    android:textStyle="bold"
+                    android:textSize="40sp"
+                    android:textColor="#000000"
+                    android:background="#c0c0c0"/>
+
+                <!-- 初期状態では非表示の詳細部分 -->
+                <LinearLayout
+                    android:id="@+id/slope_details"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:visibility="gone"
+                    android:paddingTop="8dp"
+                    android:background="#2b2b2b">
+
+                    <TextView
+                        android:id="@+id/slope_input_label"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Slope:" />
+
+                    <EditText
+                        android:id="@+id/slope_input"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:inputType="numberDecimal" />
+                </LinearLayout>
+
+            </LinearLayout>
+
+
+
+
+
+        </LinearLayout>
+
+
+    </ScrollView>
+
+
+
+
 
     <LinearLayout
         android:id="@+id/inner_parent_view"
@@ -341,6 +364,17 @@
         app:layout_constraintStart_toStartOf="parent"
         tools:layout_editor_absoluteX="0dp"
         tools:layout_editor_absoluteY="677dp">
+
+        <!-- 内部の親ビュー -->
+
+        <Button
+            android:id="@+id/save_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Save"
+            app:layout_constraintTop_toBottomOf="@+id/slope_input"
+            app:layout_constraintStart_toStartOf="parent"
+            android:layout_margin="16dp"/>
 
         <!-- 戻るボタン -->
         <Button
