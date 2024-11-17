@@ -38,6 +38,7 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 
 public class MainActivity extends CameraActivity implements CameraBridgeViewBase.CvCameraViewListener2 {
@@ -623,25 +624,33 @@ public class MainActivity extends CameraActivity implements CameraBridgeViewBase
 
 
         //初期表示値
-        int initialDisplayValue_SM = 30;
-        int initialDisplayValue_ML = 50;
-        int initialDisplayValue_weight = 30;
+//        int initialDisplayValue_SM = 30;
+//        int initialDisplayValue_ML = 50;
+//        int initialDisplayValue_weight = 30;
+        float initialDisplayValue_SM =3.0f;
+        float initialDisplayValue_ML =5.0f;
+        float initialDisplayValue_weight = 3.0f;
 
         // プリファレンスから取得（スケール済み整数値として保存）
         //サイズ（S,M,L)
         SharedPreferences sharedPref = getSharedPreferences("AppSettings", MODE_PRIVATE);
-        int Sizethreshold_S_M = sharedPref.getInt("Sizethreshold_S_M", initialDisplayValue_SM);
-        int Sizethreshold_M_L = sharedPref.getInt("Sizethreshold_M_L", initialDisplayValue_ML);
+        Map<String, ?> allEntries = sharedPref.getAll();
+        for (Map.Entry<String, ?> entry : allEntries.entrySet()) {
+            Log.d("SharedPreferences", "Key: " + entry.getKey() + ", Value: " + entry.getValue() + ", Type: " + entry.getValue().getClass().getName());
+        }
+
+        float Sizethreshold_S_M = sharedPref.getFloat("Sizethreshold_S_M", initialDisplayValue_SM);
+        float Sizethreshold_M_L = sharedPref.getFloat("Sizethreshold_M_L", initialDisplayValue_ML);
         //weight
-        int weightPredictionFactor = sharedPref.getInt("weightPredictionFactor", initialDisplayValue_weight);
+        float weightPredictionFactor = sharedPref.getFloat("weightPredictionFactor", initialDisplayValue_weight);
 
         // 必要な箇所で元のfloat値に戻す
-        float smValue = Sizethreshold_S_M / 10.0f;
-        float mlValue = Sizethreshold_M_L / 10.0f;
-        float weightFactor = weightPredictionFactor / 10.0f;
+//        float smValue = Sizethreshold_S_M / 10.0f;
+//        float mlValue = Sizethreshold_M_L / 10.0f;
+//        float weightFactor = weightPredictionFactor / 10.0f;
 
         //イチゴの重さ推定のための変数
-        final double weight = finalPredict_Size * weightFactor;
+        final double weight = finalPredict_Size * weightPredictionFactor;
         String formattedWeight = String.format("%.2f", weight);
 
 
@@ -669,10 +678,10 @@ public class MainActivity extends CameraActivity implements CameraBridgeViewBase
                     predictTextView.setText(String.valueOf(predict_time_hour)+"時間"+String.valueOf(predict_time_minutes)+"分後");
 
                     //サイズ表示（S,M,L）
-                    if(finalPredict_Size < smValue){
+                    if(finalPredict_Size < Sizethreshold_S_M){
                         Size.setText("S");
                     }
-                    else if (smValue <= finalPredict_Size && finalPredict_Size <= mlValue ){
+                    else if (Sizethreshold_S_M <= finalPredict_Size && finalPredict_Size <= Sizethreshold_M_L ){
                         Size.setText("M");
                     }
                     else{
@@ -713,10 +722,10 @@ public class MainActivity extends CameraActivity implements CameraBridgeViewBase
 
 
                     //サイズ表示（S,M,L）
-                    if(finalPredict_Size < smValue){
+                    if(finalPredict_Size < Sizethreshold_S_M){
                         Size.setText("S");
                     }
-                    else if (smValue <= finalPredict_Size && finalPredict_Size <= mlValue ){
+                    else if (Sizethreshold_S_M <= finalPredict_Size && finalPredict_Size <= Sizethreshold_M_L ){
                         Size.setText("M");
                     }
                     else{

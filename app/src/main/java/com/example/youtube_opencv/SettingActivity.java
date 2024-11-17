@@ -19,6 +19,11 @@ public class SettingActivity extends AppCompatActivity {
 
     private double slope_of_predict_line;
 
+    private double Sizethreshold_S_M;
+    private double Sizethreshold_M_L;
+
+    private double weightPredictionFactor;
+
     private EditText lowerBoundHueInput;
     private EditText lowerBoundSaturationInput;
     private EditText lowerBoundValueInput;
@@ -71,21 +76,21 @@ public class SettingActivity extends AppCompatActivity {
         float savedSaturation = sharedPref.getFloat("dr_lowerBound_2", 120);
         float savedValue = sharedPref.getFloat("dr_lowerBound_3", 78);
         float savedSlope = sharedPref.getFloat("slope_of_predict_line", 0.0199f);
-        int defaultThresholdSM = sharedPref.getInt("Sizethreshold_S_M", 30);
-        int defaultThresholdML = sharedPref.getInt("Sizethreshold_M_L", 50);
-        int defaultWeight = sharedPref.getInt("weightPredictionFactor", 30);
+        float defaultThresholdSM = sharedPref.getFloat("Sizethreshold_S_M", 3.0f);
+        float defaultThresholdML = sharedPref.getFloat("Sizethreshold_M_L", 5.0f);
+        float defaultWeight = sharedPref.getFloat("weightPredictionFactor", 3.0f);
 
         // 保存した値をUIコンポーネントに表示
         lowerBoundHueInput.setText(String.valueOf(savedHue));
         lowerBoundSaturationInput.setText(String.valueOf(savedSaturation));
         lowerBoundValueInput.setText(String.valueOf(savedValue));
         slopeInput.setText(String.valueOf(savedSlope));
-        sizethresholdSMSeekBar.setProgress(defaultThresholdSM);
-        sizethresholdMLSeekBar.setProgress(defaultThresholdML);
-        sizethresholdSMValue.setText(String.format("%.1f", defaultThresholdSM / 10.0));
-        sizethresholdMLValue.setText(String.format("%.1f", defaultThresholdML / 10.0));
-        weightSeekBar.setProgress(defaultWeight);
-        weightValue.setText(String.format("%.1f", defaultWeight / 10.0));
+        sizethresholdSMSeekBar.setProgress((int)defaultThresholdSM);
+        sizethresholdMLSeekBar.setProgress((int)defaultThresholdML);
+        sizethresholdSMValue.setText(String.format("%.1f", defaultThresholdSM));
+        sizethresholdMLValue.setText(String.format("%.1f", defaultThresholdML));
+        weightSeekBar.setProgress((int)defaultWeight);
+        weightValue.setText(String.format("%.1f", defaultWeight));
 
         // 画像リソースをセット
 //        ImageView strawberrySmall = findViewById(R.id.strawberry_small_image);
@@ -247,22 +252,25 @@ public class SettingActivity extends AppCompatActivity {
         slope_of_predict_line = Double.parseDouble(slopeInput.getText().toString());
 
         // SeekBarの値を閾値として取得
-        int newThresholdSM = sizethresholdSMSeekBar.getProgress();
-        int newThresholdML = sizethresholdMLSeekBar.getProgress();
-        int newWeight = weightSeekBar.getProgress();
+        Sizethreshold_S_M = sizethresholdSMSeekBar.getProgress();
+        Sizethreshold_M_L= sizethresholdMLSeekBar.getProgress();
+        weightPredictionFactor = weightSeekBar.getProgress();
 
         // SharedPreferencesに保存
         SharedPreferences sharedPref = getSharedPreferences("AppSettings", MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPref.edit();
+        editor.clear(); // すべての保存されたデータを削除
         editor.putFloat("dr_lowerBound_1", (float) hue);
         editor.putFloat("dr_lowerBound_2", (float) saturation);
         editor.putFloat("dr_lowerBound_3", (float) value);
         editor.putFloat("slope_of_predict_line", (float) slope_of_predict_line);
-        editor.putInt("Sizethreshold_S_M", newThresholdSM);
-        editor.putInt("Sizethreshold_M_L", newThresholdML);
-        editor.putInt("weightPredictionFactor", newWeight);
+        editor.putFloat("Sizethreshold_S_M", (float) Sizethreshold_S_M);
+        editor.putFloat("Sizethreshold_M_L", (float) Sizethreshold_M_L);
+        editor.putFloat("weightPredictionFactor", (float) weightPredictionFactor);
+
 
         editor.apply();
+
 
         Toast.makeText(this, "設定が保存されました", Toast.LENGTH_SHORT).show();
     }
