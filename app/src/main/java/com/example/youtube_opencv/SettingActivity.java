@@ -59,11 +59,15 @@ public class SettingActivity extends AppCompatActivity {
         weightSeekBar= findViewById(R.id.weight_seekbar);
         weightValue = findViewById(R.id.weight_value);
 
+
         //sizeseekbar
         float initialDisplayValue_SM = 3.0f;
         float initialDisplayValue_ML = 5.0f;
-        int initialProgress_SM = (int)(initialDisplayValue_SM*10);
+        float initialDisplayValue_Weight = 3.0f;
+
+        int initialProgress_SM = (int)(initialDisplayValue_SM * 10);
         int initialProgress_ML = (int)(initialDisplayValue_ML*10);
+        int initialProgress_Weight = (int)(initialDisplayValue_Weight*10);
 
 
 //        //weightseekbar
@@ -80,16 +84,17 @@ public class SettingActivity extends AppCompatActivity {
         float defaultThresholdML = sharedPref.getFloat("Sizethreshold_M_L", 5.0f);
         float defaultWeight = sharedPref.getFloat("weightPredictionFactor", 3.0f);
 
+
         // 保存した値をUIコンポーネントに表示
         lowerBoundHueInput.setText(String.valueOf(savedHue));
         lowerBoundSaturationInput.setText(String.valueOf(savedSaturation));
         lowerBoundValueInput.setText(String.valueOf(savedValue));
         slopeInput.setText(String.valueOf(savedSlope));
-        sizethresholdSMSeekBar.setProgress((int)defaultThresholdSM);
-        sizethresholdMLSeekBar.setProgress((int)defaultThresholdML);
+        sizethresholdSMSeekBar.setProgress(initialProgress_SM);
+        sizethresholdMLSeekBar.setProgress(initialProgress_ML);
         sizethresholdSMValue.setText(String.format("%.1f", defaultThresholdSM));
         sizethresholdMLValue.setText(String.format("%.1f", defaultThresholdML));
-        weightSeekBar.setProgress((int)defaultWeight);
+        weightSeekBar.setProgress(initialProgress_Weight);
         weightValue.setText(String.format("%.1f", defaultWeight));
 
         // 画像リソースをセット
@@ -252,9 +257,9 @@ public class SettingActivity extends AppCompatActivity {
         slope_of_predict_line = Double.parseDouble(slopeInput.getText().toString());
 
         // SeekBarの値を閾値として取得
-        Sizethreshold_S_M = sizethresholdSMSeekBar.getProgress();
-        Sizethreshold_M_L= sizethresholdMLSeekBar.getProgress();
-        weightPredictionFactor = weightSeekBar.getProgress();
+        Sizethreshold_S_M = sizethresholdSMSeekBar.getProgress()/10.0f;
+        Sizethreshold_M_L= sizethresholdMLSeekBar.getProgress()/10.0f;
+        weightPredictionFactor = weightSeekBar.getProgress()/10.0f;
 
         // SharedPreferencesに保存
         SharedPreferences sharedPref = getSharedPreferences("AppSettings", MODE_PRIVATE);
