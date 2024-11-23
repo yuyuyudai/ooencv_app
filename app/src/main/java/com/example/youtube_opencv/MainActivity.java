@@ -663,7 +663,7 @@ public class MainActivity extends CameraActivity implements CameraBridgeViewBase
 
 
 
-                pixelCountTextView.setText(String.valueOf(ripe_ratio)+"%");
+                pixelCountTextView.setText("熟度："+String.valueOf(ripe_ratio)+" %");
 
 
                 if(predict_time_dif > 0 && ratio == 0){
@@ -675,47 +675,25 @@ public class MainActivity extends CameraActivity implements CameraBridgeViewBase
                 }
                 else if (predict_time_dif > 0 && ratio != 0){
                     //予測時間表示
-                    predictTextView.setText(String.valueOf(predict_time_hour)+"時間"+String.valueOf(predict_time_minutes)+"分後");
+                    predictTextView.setText("収穫まで："+String.valueOf(predict_time_hour)+"時間"+String.valueOf(predict_time_minutes)+"分後");
 
                     //サイズ表示（S,M,L）
                     if(finalPredict_Size < Sizethreshold_S_M){
-                        Size.setText("S");
+                        Size.setText("サイズ：S");
                     }
                     else if (Sizethreshold_S_M <= finalPredict_Size && finalPredict_Size <= Sizethreshold_M_L ){
-                        Size.setText("M");
+                        Size.setText("サイズ：M");
                     }
                     else{
-                        Size.setText("L");
+                        Size.setText("サイズ：L");
                     }
 
                     //重さ表示
-                    Weight.setText(String.valueOf(formattedWeight)+"g");
+                    Weight.setText("重さ："+String.valueOf(formattedWeight)+" g");
 
 
                     //表面積表示
-                    String sizeText = String.valueOf(finalPredict_Size);
-                    String baseText = "cm";
-                    String superscriptText = "2";
-
-// SpannableStringBuilderを使用してテキストを構築
-                    SpannableStringBuilder builder = new SpannableStringBuilder();
-                    builder.append(sizeText);
-                    builder.append(baseText);
-
-// 上付き文字部分をSpannableで作成
-                    SpannableString superscriptSpannable = new SpannableString(superscriptText);
-
-// 相対サイズを指定して上付き文字を小さくする (0.6fはサイズを60%に)
-                    superscriptSpannable.setSpan(new RelativeSizeSpan(0.6f), 0, superscriptText.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-
-// 上付き文字にする
-                    superscriptSpannable.setSpan(new SuperscriptSpan(), 0, superscriptText.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-
-// 上付き文字をbuilderに追加
-                    builder.append(superscriptSpannable);
-
-// TextViewにセット
-                    targetsize.setText(builder);
+                    targetsize.setText("表面積："+finalPredict_Size+" cm²");
                 }
                 else{
                     predictTextView.setText("収穫可能");
@@ -723,42 +701,20 @@ public class MainActivity extends CameraActivity implements CameraBridgeViewBase
 
                     //サイズ表示（S,M,L）
                     if(finalPredict_Size < Sizethreshold_S_M){
-                        Size.setText("S");
+                        Size.setText("サイズ：S");
                     }
                     else if (Sizethreshold_S_M <= finalPredict_Size && finalPredict_Size <= Sizethreshold_M_L ){
-                        Size.setText("M");
+                        Size.setText("サイズ：M");
                     }
                     else{
-                        Size.setText("L");
+                        Size.setText("サイズ：L");
                     }
 
                     //重さ表示
-                    Weight.setText(String.valueOf(formattedWeight)+"g");
+                    Weight.setText("重さ："+String.valueOf(formattedWeight)+" g");
 
-                    //表面積表示
-                    String sizeText = String.valueOf(finalPredict_Size);
-                    String baseText = "cm";
-                    String superscriptText = "2";
 
-// SpannableStringBuilderを使用してテキストを構築
-                    SpannableStringBuilder builder = new SpannableStringBuilder();
-                    builder.append(sizeText);
-                    builder.append(baseText);
-
-// 上付き文字部分をSpannableで作成
-                    SpannableString superscriptSpannable = new SpannableString(superscriptText);
-
-// 相対サイズを指定して上付き文字を小さくする (0.6fはサイズを60%に)
-                    superscriptSpannable.setSpan(new RelativeSizeSpan(0.6f), 0, superscriptText.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-
-// 上付き文字にする
-                    superscriptSpannable.setSpan(new SuperscriptSpan(), 0, superscriptText.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-
-// 上付き文字をbuilderに追加
-                    builder.append(superscriptSpannable);
-
-// TextViewにセット
-                    targetsize.setText(builder);
+                    targetsize.setText("表面積："+finalPredict_Size+" cm²");
                 }
 
 

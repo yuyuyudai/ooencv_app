@@ -4,7 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".SettingActivity">
+    tools:context=".SettingActivity"
+    android:background="#CCCCCC">
 
 
 
@@ -20,11 +21,11 @@
         android:layout_marginStart="16dp"
         android:layout_marginEnd="16dp"
         android:gravity="center"
-        android:textColor="#2b2b2b"
+        android:textColor="#000000"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        android:background="#f5f5f5"/>
+        android:background="#9c9c9c"/>
 
 
     <!-- スクロール可能なビュー -->
@@ -68,7 +69,7 @@
                     android:clickable="true"
                     android:focusable="true"
                     android:textColor="#000000"
-                    android:background="#c0c0c0"/>
+                    android:background="#DEDEDE"/>
 
                 <!-- サイズの視覚的ガイド -->
                 <LinearLayout
@@ -170,7 +171,7 @@
                     android:clickable="true"
                     android:focusable="true"
                     android:textColor="#000000"
-                    android:background="#c0c0c0"/>
+                    android:background="#DEDEDE"/>
 
                 <!-- 初期状態では非表示の詳細部分 -->
                 <LinearLayout
@@ -245,7 +246,7 @@
                     android:clickable="true"
                     android:focusable="true"
                     android:textColor="#000000"
-                    android:background="#c0c0c0"/>
+                    android:background="#DEDEDE"/>
 
                 <!-- 初期状態では非表示の詳細部分 -->
                 <LinearLayout
@@ -312,7 +313,7 @@
                     android:textStyle="bold"
                     android:textSize="40sp"
                     android:textColor="#000000"
-                    android:background="#c0c0c0"/>
+                    android:background="#DEDEDE"/>
 
                 <!-- 初期状態では非表示の詳細部分 -->
                 <LinearLayout
@@ -347,9 +348,7 @@
 
 
     </ScrollView>
-
-
-
+    
 
 
     <LinearLayout
