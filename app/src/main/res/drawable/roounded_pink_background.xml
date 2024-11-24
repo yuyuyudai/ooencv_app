@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- 背景色をピンクに設定 -->
+    <solid android:color="#FFC0CB" /> <!-- ピンクの色 (カスタマイズ可能) -->
+
+    <!-- 角を丸く設定 -->
+    <corners android:radius="16dp" />
+
+    <!-- 任意: 枠線を追加する場合 -->
+    <stroke
+        android:width="2dp"
+        android:color="#FFB6C1" /> <!-- 薄いピンクの枠線 -->
+</shape>

@@ -662,15 +662,18 @@ public class MainActivity extends CameraActivity implements CameraBridgeViewBase
 
 
 
-
-                pixelCountTextView.setText("熟度："+String.valueOf(ripe_ratio)+" %");
+                //熟度表示（単位あり）
+//                pixelCountTextView.setText("熟度："+String.valueOf(ripe_ratio)+" %");
+                //熟度表示（単位なし）
+                pixelCountTextView.setText("熟度："+String.valueOf(ripe_ratio)+"%");
 
 
                 if(predict_time_dif > 0 && ratio == 0){
-                    predictTextView.setText(String.valueOf(""));
-                    Size.setText(String.valueOf(""));
-                    Weight.setText(String.valueOf(""));
-                    targetsize.setText(String.valueOf(""));
+                    pixelCountTextView.setText(String.valueOf("熟度："));
+                    predictTextView.setText(String.valueOf("収穫まで："));
+                    Size.setText(String.valueOf("サイズ："));
+                    Weight.setText(String.valueOf("重さ："));
+                    targetsize.setText(String.valueOf("表面積："));
 
                 }
                 else if (predict_time_dif > 0 && ratio != 0){
@@ -688,12 +691,16 @@ public class MainActivity extends CameraActivity implements CameraBridgeViewBase
                         Size.setText("サイズ：L");
                     }
 
-                    //重さ表示
-                    Weight.setText("重さ："+String.valueOf(formattedWeight)+" g");
+                    //重さ表示(単位あり)
+//                    Weight.setText("重さ："+String.valueOf(formattedWeight)+" g");
+                    //（単位なし）
+                    Weight.setText("重さ："+String.valueOf(formattedWeight));
 
 
-                    //表面積表示
+                    //表面積表示(単位あり)
                     targetsize.setText("表面積："+finalPredict_Size+" cm²");
+                    //(単位なし)
+//                    targetsize.setText("表面積："+finalPredict_Size);
                 }
                 else{
                     predictTextView.setText("収穫可能");
@@ -710,11 +717,16 @@ public class MainActivity extends CameraActivity implements CameraBridgeViewBase
                         Size.setText("サイズ：L");
                     }
 
-                    //重さ表示
+                    //重さ表示(単位あり)
                     Weight.setText("重さ："+String.valueOf(formattedWeight)+" g");
+                    //（単位なし）
+//                    Weight.setText("重さ："+String.valueOf(formattedWeight));
 
 
-                    targetsize.setText("表面積："+finalPredict_Size+" cm²");
+                    //表面積表示(単位あり)
+//                    targetsize.setText("表面積："+finalPredict_Size+" cm²");
+                    //(単位なし)
+                    targetsize.setText("表面積："+finalPredict_Size);
                 }
 
 
