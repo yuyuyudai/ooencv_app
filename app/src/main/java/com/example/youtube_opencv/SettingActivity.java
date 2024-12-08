@@ -9,6 +9,8 @@ import android.text.SpannableStringBuilder;
 import android.text.style.RelativeSizeSpan;
 import android.text.style.SuperscriptSpan;
 import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -45,6 +47,8 @@ public class SettingActivity extends AppCompatActivity {
 
     private EditText slopeInput;
 
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -63,6 +67,14 @@ public class SettingActivity extends AppCompatActivity {
         sizethresholdMLValue = findViewById(R.id.sizethreshold_m_l_value);
         weightSeekBar= findViewById(R.id.weight_seekbar);
         weightValue = findViewById(R.id.weight_value);
+
+
+//        項目ごとにトグルアイコンIDを取得
+        LinearLayout toggleItem1 = findViewById(R.id.size_threshold_section);
+        TextView toggleIcon1 = findViewById(R.id.toggle_icon_1);
+        LinearLayout toggleContent1 = findViewById(R.id.size_threshold_details);
+        boolean[] isExpanded1 = {false}; // トグル状態
+        toggleItem1.setOnClickListener(v -> toggleContent(toggleIcon1, toggleContent1, isExpanded1));
 
 
         //sizeseekbar
@@ -203,16 +215,16 @@ public class SettingActivity extends AppCompatActivity {
             }
         });
 
-        sizeLabel.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (sizeThresholdDetails.getVisibility() == View.GONE) {
-                    sizeThresholdDetails.setVisibility(View.VISIBLE);
-                } else {
-                    sizeThresholdDetails.setVisibility(View.GONE);
-                }
-            }
-        });
+//        sizeLabel.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                if (sizeThresholdDetails.getVisibility() == View.GONE) {
+//                    sizeThresholdDetails.setVisibility(View.VISIBLE);
+//                } else {
+//                    sizeThresholdDetails.setVisibility(View.GONE);
+//                }
+//            }
+//        });
 
 
         // SeekBarのリスナー設定
@@ -223,28 +235,7 @@ public class SettingActivity extends AppCompatActivity {
                 float displayedValue = progress / 10.0f;
                 //表面積表示
                 String sizeText = String.valueOf(displayedValue);
-                String baseText = "cm";
-                String superscriptText = "2";
-
-// SpannableStringBuilderを使用してテキストを構築
-                SpannableStringBuilder builder = new SpannableStringBuilder();
-                builder.append(sizeText);
-                builder.append(baseText);
-
-// 上付き文字部分をSpannableで作成
-                SpannableString superscriptSpannable = new SpannableString(superscriptText);
-
-// 相対サイズを指定して上付き文字を小さくする (0.6fはサイズを60%に)
-                superscriptSpannable.setSpan(new RelativeSizeSpan(0.6f), 0, superscriptText.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-
-// 上付き文字にする
-                superscriptSpannable.setSpan(new SuperscriptSpan(), 0, superscriptText.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-
-// 上付き文字をbuilderに追加
-                builder.append(superscriptSpannable);
-
-// TextViewにセット
-                sizethresholdSMValue.setText(builder);
+                sizethresholdSMValue.setText(sizeText+" cm²");
             }
 
             @Override
@@ -330,6 +321,27 @@ public class SettingActivity extends AppCompatActivity {
                 finish();
             }
         });
+    }
+
+    private void toggleContent(View toggleIcon, View toggleContent, boolean[] isExpandedState) {
+        // アニメーションをロード
+        Animation rotateToDown = AnimationUtils.loadAnimation(this, R.anim.rotate_to_down);
+        Animation rotateToRight = AnimationUtils.loadAnimation(this, R.anim.rotate_to_right);
+
+        if (isExpandedState[0]) {
+            // トグルを閉じる
+            toggleContent.setVisibility(View.GONE);
+            toggleIcon.startAnimation(rotateToRight);
+            ((TextView) toggleIcon).setText("＞"); // アイコンを更新
+        } else {
+            // トグルを開く
+            toggleContent.setVisibility(View.VISIBLE);
+            toggleIcon.startAnimation(rotateToDown);
+            ((TextView) toggleIcon).setText("⌄"); // アイコンを更新
+        }
+
+        // トグル状態を反転
+        isExpandedState[0] = !isExpandedState[0];
     }
 
     private void saveSettings() {

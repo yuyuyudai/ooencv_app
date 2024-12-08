@@ -234,7 +234,7 @@
                 android:text="サイズ"
                 android:textStyle="bold"
                 android:textColor="@color/black"
-                android:textSize="35sp"
+                android:textSize="33sp"
                 android:gravity="center" />
 
             <!-- 重さ -->
@@ -246,7 +246,7 @@
                 android:text="重さ"
                 android:textStyle="bold"
                 android:textColor="@color/black"
-                android:textSize="35sp"
+                android:textSize="33sp"
                 android:gravity="center" />
         </LinearLayout>
 

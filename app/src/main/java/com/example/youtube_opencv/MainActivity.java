@@ -665,7 +665,7 @@ public class MainActivity extends CameraActivity implements CameraBridgeViewBase
                 //熟度表示（単位あり）
 //                pixelCountTextView.setText("熟度："+String.valueOf(ripe_ratio)+" %");
                 //熟度表示（単位なし）
-                pixelCountTextView.setText("熟度："+String.valueOf(ripe_ratio)+"%");
+                pixelCountTextView.setText("熟度："+String.valueOf(ripe_ratio));
 
 
                 if(predict_time_dif > 0 && ratio == 0){
@@ -698,9 +698,9 @@ public class MainActivity extends CameraActivity implements CameraBridgeViewBase
 
 
                     //表面積表示(単位あり)
-                    targetsize.setText("表面積："+finalPredict_Size+" cm²");
+//                    targetsize.setText("表面積："+finalPredict_Size+" cm²");
                     //(単位なし)
-//                    targetsize.setText("表面積："+finalPredict_Size);
+                    targetsize.setText("表面積："+finalPredict_Size);
                 }
                 else{
                     predictTextView.setText("収穫可能");
@@ -718,9 +718,9 @@ public class MainActivity extends CameraActivity implements CameraBridgeViewBase
                     }
 
                     //重さ表示(単位あり)
-                    Weight.setText("重さ："+String.valueOf(formattedWeight)+" g");
+//                    Weight.setText("重さ："+String.valueOf(formattedWeight)+" g");
                     //（単位なし）
-//                    Weight.setText("重さ："+String.valueOf(formattedWeight));
+                    Weight.setText("重さ："+String.valueOf(formattedWeight));
 
 
                     //表面積表示(単位あり)

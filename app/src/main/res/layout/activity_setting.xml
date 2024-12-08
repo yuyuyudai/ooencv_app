@@ -57,21 +57,38 @@
                 android:padding="10dp">
 
 
+                <LinearLayout
+                    android:id="@+id/size_threshold_container"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:padding="16dp"
+                    android:background="#DEDEDE">
+
+                <!-- 記号部分 -->
+                <TextView
+                    android:id="@+id/toggle_icon_1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="＞"
+                    android:textStyle="bold"
+                    android:textSize="40sp"
+                    android:textColor="#000000"
+                    android:paddingEnd="8dp" />
 
                 <!-- タイトル部分 -->
                 <TextView
                     android:id="@+id/size_threshold_title"
-                    android:layout_width="match_parent"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="サイズ: (S,M,L)"
                     android:textStyle="bold"
                     android:textSize="40sp"
-                    android:clickable="true"
-                    android:focusable="true"
-                    android:textColor="#000000"
-                    android:background="#DEDEDE"/>
+                    android:textColor="#000000" />
+            </LinearLayout>
 
-                <!-- サイズの視覚的ガイド -->
+
+            <!-- サイズの視覚的ガイド -->
                 <LinearLayout
                     android:id="@+id/size_threshold_details"
                     android:layout_width="match_parent"
