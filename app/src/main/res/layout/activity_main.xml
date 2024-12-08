@@ -6,18 +6,6 @@
     android:layout_height="match_parent"
     tools:context=".MainActivity">
 
-    <!--<org.opencv.android.JavaCameraView-->
-
-    <!--<TextView
-        android:layout_width="136dp"
-        android:layout_height="44dp"
-        android:text="Hello World!"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.552"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.963" />-->
 
 
 
@@ -35,98 +23,6 @@
         tools:ignore="MissingClass" />
 
 
-    <!--    <View-->
-    <!--        android:id="@+id/frameView"-->
-    <!--        android:layout_width="217dp"-->
-    <!--        android:layout_height="255dp"-->
-    <!--        android:layout_gravity="center"-->
-    <!--        android:background="@drawable/shape_style"-->
-    <!--        app:layout_constraintBottom_toBottomOf="parent"-->
-    <!--        app:layout_constraintLeft_toLeftOf="parent"-->
-    <!--        app:layout_constraintRight_toRightOf="parent"-->
-    <!--        app:layout_constraintTop_toTopOf="parent"-->
-    <!--        app:layout_constraintVertical_bias="0.444" />-->
-
-    <!--    熟度値-->
-    <!--    <TextView-->
-    <!--        android:id="@+id/pixelsInMask1str"-->
-    <!--        android:layout_width="wrap_content"-->
-    <!--        android:layout_height="wrap_content"-->
-    <!--        android:text=""-->
-    <!--        android:textColor="@color/black"-->
-    <!--        android:background="#77FFFFFF"-->
-    <!--        android:textSize="80dp"-->
-    <!--        app:layout_constraintBottom_toBottomOf="parent"-->
-    <!--        app:layout_constraintEnd_toEndOf="parent"-->
-    <!--        app:layout_constraintStart_toStartOf="parent"-->
-    <!--        app:layout_constraintTop_toTopOf="parent"-->
-    <!--        app:layout_constraintVertical_bias="0.742" />-->
-
-
-    <!--予測時間-->
-    <!--    <TextView-->
-    <!--        android:id="@+id/predict"-->
-    <!--        android:layout_width="wrap_content"-->
-    <!--        android:layout_height="wrap_content"-->
-    <!--        android:background="#77FFFFFF"-->
-    <!--        android:text=""-->
-    <!--        android:textColor="@color/black"-->
-    <!--        android:textSize="60dp"-->
-    <!--        app:layout_constraintBottom_toBottomOf="parent"-->
-    <!--        app:layout_constraintEnd_toEndOf="parent"-->
-    <!--        app:layout_constraintStart_toStartOf="parent"-->
-    <!--        app:layout_constraintTop_toTopOf="parent"-->
-    <!--        app:layout_constraintVertical_bias="0.912" />-->
-
-    <!--基準点1(harfripe)-->
-
-    <!--    表面積-->
-    <!--    <TextView-->
-    <!--        android:id="@+id/targetsize"-->
-    <!--        android:layout_width="wrap_content"-->
-    <!--        android:layout_height="wrap_content"-->
-    <!--        android:background="#77FFFFFF"-->
-    <!--        android:text=""-->
-    <!--        android:textColor="@color/black"-->
-    <!--        android:textSize="50dp"-->
-    <!--        app:layout_constraintBottom_toBottomOf="parent"-->
-    <!--        app:layout_constraintEnd_toEndOf="parent"-->
-    <!--        app:layout_constraintHorizontal_bias="0.873"-->
-    <!--        app:layout_constraintStart_toStartOf="parent"-->
-    <!--        app:layout_constraintTop_toTopOf="parent"-->
-    <!--        app:layout_constraintVertical_bias="0.259" />-->
-
-    <!--    イチゴのサイズ-->
-    <!--    <TextView-->
-    <!--        android:id="@+id/Size"-->
-    <!--        android:layout_width="wrap_content"-->
-    <!--        android:layout_height="wrap_content"-->
-    <!--        android:background="#77FFFFFF"-->
-    <!--        android:text=""-->
-    <!--        android:textColor="@color/black"-->
-    <!--        android:textSize="50dp"-->
-    <!--        app:layout_constraintBottom_toBottomOf="parent"-->
-    <!--        app:layout_constraintEnd_toEndOf="parent"-->
-    <!--        app:layout_constraintHorizontal_bias="0.873"-->
-    <!--        app:layout_constraintStart_toStartOf="parent"-->
-    <!--        app:layout_constraintTop_toTopOf="parent"-->
-    <!--        app:layout_constraintVertical_bias="0.459" />-->
-
-    <!--    重さ-->
-    <!--    <TextView-->
-    <!--        android:id="@+id/Weight"-->
-    <!--        android:layout_width="wrap_content"-->
-    <!--        android:layout_height="wrap_content"-->
-    <!--        android:background="#77FFFFFF"-->
-    <!--        android:text=""-->
-    <!--        android:textColor="@color/black"-->
-    <!--        android:textSize="50dp"-->
-    <!--        app:layout_constraintBottom_toBottomOf="parent"-->
-    <!--        app:layout_constraintEnd_toEndOf="parent"-->
-    <!--        app:layout_constraintHorizontal_bias="0.873"-->
-    <!--        app:layout_constraintStart_toStartOf="parent"-->
-    <!--        app:layout_constraintTop_toTopOf="parent"-->
-    <!--        app:layout_constraintVertical_bias="0.57" />-->
 
     <TextView
         android:id="@+id/color_box_harf"
@@ -201,17 +97,53 @@
 
 
 
+    <View
+        android:id="@+id/border_view_ripe"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:background="@drawable/border_ripe"
+        android:visibility="gone"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <View
+        android:id="@+id/border_view_half_ripe"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:background="@drawable/border_half_ripe"
+        android:visibility="gone"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <View
+        android:id="@+id/border_view_over_ripe"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:background="@drawable/border_over_ripe"
+        android:visibility="gone"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+
+
     <!-- フィードバックエリア -->
+
+
     <androidx.constraintlayout.widget.ConstraintLayout
-        xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="72dp"
+        android:layout_marginBottom="56dp"
         android:background="@drawable/roounded_pink_background"
         android:padding="16dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent">
 
         <!-- 1列目 (サイズと重さ: 横並び) -->
@@ -219,11 +151,11 @@
             android:id="@+id/row1"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
             android:layout_marginBottom="8dp"
-            app:layout_constraintTop_toTopOf="parent"
+            android:orientation="horizontal"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent">
+            app:layout_constraintTop_toTopOf="parent">
 
             <!-- サイズ -->
             <TextView
@@ -231,11 +163,11 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="サイズ"
-                android:textStyle="bold"
+                android:gravity="center"
+                android:text="サイズ："
                 android:textColor="@color/black"
                 android:textSize="33sp"
-                android:gravity="center" />
+                android:textStyle="bold" />
 
             <!-- 重さ -->
             <TextView
@@ -243,11 +175,11 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="重さ"
-                android:textStyle="bold"
+                android:gravity="center"
+                android:text="重さ："
                 android:textColor="@color/black"
                 android:textSize="33sp"
-                android:gravity="center" />
+                android:textStyle="bold" />
         </LinearLayout>
 
 
@@ -255,11 +187,11 @@
             android:id="@+id/row2"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
             android:layout_marginBottom="8dp"
-            app:layout_constraintTop_toBottomOf="@id/row1"
+            android:orientation="horizontal"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent">
+            app:layout_constraintTop_toBottomOf="@id/row1">
 
             <!-- 表面積 -->
             <TextView
@@ -267,10 +199,10 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="サイズ"
+                android:gravity="center"
+                android:text="熟度："
                 android:textColor="@color/black"
-                android:textSize="25sp"
-                android:gravity="center" />
+                android:textSize="25sp" />
 
             <!-- 重さ -->
             <TextView
@@ -278,10 +210,10 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:text="重さ"
+                android:gravity="center"
+                android:text="表面積："
                 android:textColor="@color/black"
-                android:textSize="25sp"
-                android:gravity="center" />
+                android:textSize="25sp" />
         </LinearLayout>
 
 
@@ -290,21 +222,17 @@
             android:id="@+id/predict"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="収穫までの時間"
+            android:layout_marginBottom="8dp"
+            android:gravity="center"
+            android:text="収穫まで："
             android:textColor="@color/black"
             android:textSize="30sp"
-            android:layout_marginBottom="8dp"
-            app:layout_constraintTop_toBottomOf="@id/row2"
-            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            android:gravity="center" />
-
-
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/row2" />
 
 
     </androidx.constraintlayout.widget.ConstraintLayout>
-
-
 
     <LinearLayout
         android:id="@+id/button_container"

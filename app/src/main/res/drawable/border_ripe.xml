@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- 背景を透明に設定 -->
+    <solid android:color="@android:color/transparent" />
+
+    <!-- 枠線の色と太さを設定 -->
+    <stroke
+        android:width="20dp"
+        android:color="#FF0000" />
+</shape>

@@ -56,6 +56,9 @@ public class MainActivity extends CameraActivity implements CameraBridgeViewBase
     public TextView coloredBox_ripe;
     public TextView introduct;
 
+    public View borderView_ripe;
+    public View borderView_half_ripe;
+    public View borderView_over_ripe;
     private CameraBridgeViewBase mOpenCvCameraView;
     private boolean              mIsJavaCamera = true;
     private MenuItem             mItemSwitchCamera = null;
@@ -139,6 +142,9 @@ public class MainActivity extends CameraActivity implements CameraBridgeViewBase
         coloredBox_harf = findViewById(R.id.color_box_harf);
         coloredBox_ripe = findViewById(R.id.color_box_ripe);
         introduct = findViewById(R.id.introduction_text);
+        borderView_ripe = findViewById(R.id.border_view_ripe);
+        borderView_half_ripe = findViewById(R.id.border_view_half_ripe);
+        borderView_over_ripe = findViewById(R.id.border_view_over_ripe);
 
         mOpenCvCameraView = (CameraBridgeViewBase) findViewById(R.id.camera_view);
 
@@ -661,6 +667,10 @@ public class MainActivity extends CameraActivity implements CameraBridgeViewBase
             public void run() {
 
 
+                // 枠線を非表示
+                borderView_ripe.setVisibility(View.GONE);
+                borderView_half_ripe.setVisibility(View.GONE);
+                borderView_over_ripe.setVisibility(View.GONE);
 
                 //熟度表示（単位あり）
 //                pixelCountTextView.setText("熟度："+String.valueOf(ripe_ratio)+" %");
@@ -744,11 +754,16 @@ public class MainActivity extends CameraActivity implements CameraBridgeViewBase
                     coloredBox_harf.setVisibility(View.VISIBLE);
                     coloredBox_ripe.setVisibility(View.GONE);
                     coloredText_overripe.setVisibility(View.GONE);
+                    // 枠線を表示
+                    borderView_half_ripe.setVisibility(View.VISIBLE);
+
                 } else if (ratio >= 60 && ratio < 80){//65～85はripeを表示
                     introduct.setVisibility(View.GONE);
                     coloredBox_harf.setVisibility(View.GONE);
                     coloredBox_ripe.setVisibility(View.VISIBLE);
                     coloredText_overripe.setVisibility(View.GONE);
+                    // 枠線を表示
+                    borderView_ripe.setVisibility(View.VISIBLE);
                 }
                 else{//85以上はover_ripeを表示
                     introduct.setVisibility(View.GONE);
@@ -756,6 +771,8 @@ public class MainActivity extends CameraActivity implements CameraBridgeViewBase
                     coloredBox_ripe.setVisibility(View.GONE);
                     coloredText_overripe.setVisibility(View.VISIBLE);
                     ((Vibrator) getSystemService(Context.VIBRATOR_SERVICE)).vibrate(100);
+                    // 枠線を表示
+                    borderView_over_ripe.setVisibility(View.VISIBLE);
                 }
             }
 
