@@ -630,12 +630,11 @@ public class MainActivity extends CameraActivity implements CameraBridgeViewBase
 
 
         //初期表示値
-//        int initialDisplayValue_SM = 30;
-//        int initialDisplayValue_ML = 50;
-//        int initialDisplayValue_weight = 30;
         float initialDisplayValue_SM =3.0f;
         float initialDisplayValue_ML =5.0f;
         float initialDisplayValue_weight = 3.0f;
+        float initialDisplayValue_halfripe_ripe = 60.0f;
+        float initialDisplayValue_ripe_overripe = 80.0f;
 
         // プリファレンスから取得（スケール済み整数値として保存）
         //サイズ（S,M,L)
@@ -645,15 +644,15 @@ public class MainActivity extends CameraActivity implements CameraBridgeViewBase
             Log.d("SharedPreferences", "Key: " + entry.getKey() + ", Value: " + entry.getValue() + ", Type: " + entry.getValue().getClass().getName());
         }
 
+        //size
         float Sizethreshold_S_M = sharedPref.getFloat("Sizethreshold_S_M", initialDisplayValue_SM);
         float Sizethreshold_M_L = sharedPref.getFloat("Sizethreshold_M_L", initialDisplayValue_ML);
         //weight
         float weightPredictionFactor = sharedPref.getFloat("weightPredictionFactor", initialDisplayValue_weight);
+        //ripefeedback
+        float ripefeedback_HalfRipe_Ripe = sharedPref.getFloat("ripefeedback_HalfRipe_Ripe", initialDisplayValue_halfripe_ripe);
+        float ripefeedback_Ripe_OverRipe = sharedPref.getFloat("ripefeedback_Ripe_OverRipe", initialDisplayValue_ripe_overripe);
 
-        // 必要な箇所で元のfloat値に戻す
-//        float smValue = Sizethreshold_S_M / 10.0f;
-//        float mlValue = Sizethreshold_M_L / 10.0f;
-//        float weightFactor = weightPredictionFactor / 10.0f;
 
         //イチゴの重さ推定のための変数
         final double weight = finalPredict_Size * weightPredictionFactor;
@@ -749,7 +748,7 @@ public class MainActivity extends CameraActivity implements CameraBridgeViewBase
                     coloredBox_harf.setVisibility(View.GONE);
                     coloredBox_ripe.setVisibility(View.GONE);
                     coloredText_overripe.setVisibility(View.GONE);
-                } else if (ratio >= 30 && ratio < 60) {//40～65はharf_ripeを表示
+                } else if (ratio >= 30 && ratio < ripefeedback_HalfRipe_Ripe) {//40～60はharf_ripeを表示
                     introduct.setVisibility(View.GONE);
                     coloredBox_harf.setVisibility(View.VISIBLE);
                     coloredBox_ripe.setVisibility(View.GONE);
@@ -757,7 +756,7 @@ public class MainActivity extends CameraActivity implements CameraBridgeViewBase
                     // 枠線を表示
                     borderView_half_ripe.setVisibility(View.VISIBLE);
 
-                } else if (ratio >= 60 && ratio < 80){//65～85はripeを表示
+                } else if (ripefeedback_HalfRipe_Ripe >= 60 && ratio < ripefeedback_Ripe_OverRipe){//60～80はripeを表示
                     introduct.setVisibility(View.GONE);
                     coloredBox_harf.setVisibility(View.GONE);
                     coloredBox_ripe.setVisibility(View.VISIBLE);
@@ -765,7 +764,7 @@ public class MainActivity extends CameraActivity implements CameraBridgeViewBase
                     // 枠線を表示
                     borderView_ripe.setVisibility(View.VISIBLE);
                 }
-                else{//85以上はover_ripeを表示
+                else{//80以上はover_ripeを表示
                     introduct.setVisibility(View.GONE);
                     coloredBox_harf.setVisibility(View.GONE);
                     coloredBox_ripe.setVisibility(View.GONE);

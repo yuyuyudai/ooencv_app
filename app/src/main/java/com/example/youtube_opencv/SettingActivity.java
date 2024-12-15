@@ -1,6 +1,10 @@
 package com.example.youtube_opencv;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
+
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.text.Spannable;
@@ -29,6 +33,9 @@ public class SettingActivity extends AppCompatActivity {
     private double Sizethreshold_S_M;
     private double Sizethreshold_M_L;
 
+    private double Ripefeedback_halfripe_ripe;
+    private double Ripefeedback_ripe_overripe;
+
     private double weightPredictionFactor;
 
     private EditText lowerBoundHueInput;
@@ -42,6 +49,12 @@ public class SettingActivity extends AppCompatActivity {
     private TextView sizethresholdSMValue;
     private TextView sizethresholdMLValue;
 
+
+    private SeekBar ripefeedbackHalfRipe_RipeSeekBar;
+    private SeekBar ripefeedbackRipe_OverRipeSeekBar;
+    private TextView ripefeedbackHalfRipe_RipeValue;
+    private TextView ripefeedbackRipe_OverRipeValue;
+
     private SeekBar weightSeekBar;
     private TextView weightValue;
 
@@ -53,6 +66,9 @@ public class SettingActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_setting);
+
+        // MainFragment を設定画面内に表示する
+//        loadMainFragment();
 
         // EditTextのIDを取得
         lowerBoundHueInput = findViewById(R.id.lower_bound_input_hue);
@@ -67,6 +83,10 @@ public class SettingActivity extends AppCompatActivity {
         sizethresholdMLValue = findViewById(R.id.sizethreshold_m_l_value);
         weightSeekBar= findViewById(R.id.weight_seekbar);
         weightValue = findViewById(R.id.weight_value);
+        ripefeedbackHalfRipe_RipeSeekBar = findViewById(R.id.ripefeedback_halfripe_ripe_seekbar);
+        ripefeedbackRipe_OverRipeSeekBar = findViewById(R.id.ripefeedback_ripe_overripe_seekbar);
+        ripefeedbackHalfRipe_RipeValue = findViewById(R.id.ripefeedback_halfripe_ripe_value);
+        ripefeedbackRipe_OverRipeValue = findViewById(R.id.ripefeedback_ripe_overripe_value);
 
 
 //        項目ごとにトグルアイコンIDを取得
@@ -77,19 +97,30 @@ public class SettingActivity extends AppCompatActivity {
         toggleItem1.setOnClickListener(v -> toggleContent(toggleIcon1, toggleContent1, isExpanded1));
 
 
+
+        //        項目ごとにトグルアイコンIDを取得
+        LinearLayout toggleItem2 = findViewById(R.id.ripe_feedback_section);
+        TextView toggleIcon2 = findViewById(R.id.toggle_icon_2);
+        LinearLayout toggleContent2 = findViewById(R.id.ripe_feedback_details);
+        boolean[] isExpanded2 = {false}; // トグル状態
+        toggleItem2.setOnClickListener(v -> toggleContent(toggleIcon2, toggleContent2, isExpanded2));
+
+
         //sizeseekbar
+        //size
         float initialDisplayValue_SM = 3.0f;
         float initialDisplayValue_ML = 5.0f;
+        //weight
         float initialDisplayValue_Weight = 3.0f;
+        //ripefeedback
+        float initialDisplayValue_halfripe_ripe = 60.0f;
+        float initialDisplayValue_ripe_overripe = 80.0f;
 
         int initialProgress_SM = (int)(initialDisplayValue_SM * 10);
         int initialProgress_ML = (int)(initialDisplayValue_ML*10);
         int initialProgress_Weight = (int)(initialDisplayValue_Weight*10);
-
-
-//        //weightseekbar
-//        float initialDisplay_weight = 3.0f;
-//        int initialProgress_weight = (int)(initialDisplay_weight*10);
+        int initialProgress_halfripe_ripe = (int)(initialDisplayValue_halfripe_ripe);
+        int initialProgress_ripe_overripe = (int)(initialDisplayValue_ripe_overripe);
 
         // SharedPreferencesからデータを読み込む
         SharedPreferences sharedPref = getSharedPreferences("AppSettings", MODE_PRIVATE);
@@ -100,7 +131,8 @@ public class SettingActivity extends AppCompatActivity {
         float defaultThresholdSM = sharedPref.getFloat("Sizethreshold_S_M", 3.0f);
         float defaultThresholdML = sharedPref.getFloat("Sizethreshold_M_L", 5.0f);
         float defaultWeight = sharedPref.getFloat("weightPredictionFactor", 3.0f);
-
+        float defaultHalfRipe_Ripe = sharedPref.getFloat("ripefeedback_HalfRipe_Ripe", 60.0f);
+        float defaultRipe_OverRipe = sharedPref.getFloat("ripefeedback_Ripe_OverRipe", 80.0f);
 
         String sizeText_SM = String.valueOf(defaultThresholdSM);
         String sizeText_ML = String.valueOf(defaultThresholdML);
@@ -145,6 +177,10 @@ public class SettingActivity extends AppCompatActivity {
         sizethresholdMLValue.setText(builder_ML);
         weightSeekBar.setProgress(initialProgress_Weight);
         weightValue.setText(String.format("%.1f", defaultWeight));
+        ripefeedbackHalfRipe_RipeSeekBar.setProgress(initialProgress_halfripe_ripe);
+        ripefeedbackRipe_OverRipeSeekBar.setProgress(initialProgress_ripe_overripe);
+        ripefeedbackHalfRipe_RipeValue.setText(String.format("%.1f", defaultHalfRipe_Ripe));
+        ripefeedbackRipe_OverRipeValue.setText(String.format("%.1f", defaultRipe_OverRipe));
 
         // 画像リソースをセット
 //        ImageView strawberrySmall = findViewById(R.id.strawberry_small_image);
@@ -171,6 +207,9 @@ public class SettingActivity extends AppCompatActivity {
         final LinearLayout sizeThresholdDetails = findViewById(R.id.size_threshold_details);
         TextView sizeLabel = findViewById(R.id.size_threshold_title);
 
+        //feedbackセクションのIDを追加
+        final LinearLayout ripeFeedbackDetails = findViewById(R.id.ripe_feedback_details);
+        TextView RipefeedbackLabel = findViewById(R.id.ripe_feedback_title);
 
         // 初期は詳細部分を隠す設定
         lowerBoundDetails.setVisibility(View.GONE);
@@ -305,6 +344,42 @@ public class SettingActivity extends AppCompatActivity {
         });
 
 
+        ripefeedbackHalfRipe_RipeSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                // 0.1倍して0～10の範囲の値に変換
+                float displayedValue = progress;
+                //表面積表示
+                String sizeText = String.valueOf(displayedValue);
+                ripefeedbackHalfRipe_RipeValue.setText(String.format("%.1f", displayedValue));
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {}
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {}
+        });
+
+
+        ripefeedbackRipe_OverRipeSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                // 0.1倍して0～10の範囲の値に変換
+                float displayedValue = progress;
+                //表面積表示
+                String sizeText = String.valueOf(displayedValue);
+                ripefeedbackRipe_OverRipeValue.setText(String.format("%.1f", displayedValue));
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {}
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {}
+        });
+
+
         // 設定画面で保存ボタンを押したときの処理
         findViewById(R.id.save_button).setOnClickListener(new View.OnClickListener() {
             @Override
@@ -344,6 +419,9 @@ public class SettingActivity extends AppCompatActivity {
         isExpandedState[0] = !isExpandedState[0];
     }
 
+
+
+
     private void saveSettings() {
         // 入力された値を取得
         double hue = Double.parseDouble(lowerBoundHueInput.getText().toString());
@@ -358,6 +436,9 @@ public class SettingActivity extends AppCompatActivity {
         Sizethreshold_S_M = sizethresholdSMSeekBar.getProgress()/10.0f;
         Sizethreshold_M_L= sizethresholdMLSeekBar.getProgress()/10.0f;
         weightPredictionFactor = weightSeekBar.getProgress()/10.0f;
+        Ripefeedback_halfripe_ripe = ripefeedbackHalfRipe_RipeSeekBar.getProgress();
+        Ripefeedback_ripe_overripe = ripefeedbackRipe_OverRipeSeekBar.getProgress();
+
 
         // SharedPreferencesに保存
         SharedPreferences sharedPref = getSharedPreferences("AppSettings", MODE_PRIVATE);
@@ -370,6 +451,8 @@ public class SettingActivity extends AppCompatActivity {
         editor.putFloat("Sizethreshold_S_M", (float) Sizethreshold_S_M);
         editor.putFloat("Sizethreshold_M_L", (float) Sizethreshold_M_L);
         editor.putFloat("weightPredictionFactor", (float) weightPredictionFactor);
+        editor.putFloat("ripefeedback_HalfRipe_Ripe", (float) Ripefeedback_halfripe_ripe);
+        editor.putFloat("ripefeedback_Ripe_OverRipe", (float) Ripefeedback_ripe_overripe);
 
 
         editor.apply();
@@ -377,4 +460,17 @@ public class SettingActivity extends AppCompatActivity {
 
         Toast.makeText(this, "設定が保存されました", Toast.LENGTH_SHORT).show();
     }
+
+
+//    private void loadMainFragment() {
+//        FragmentManager fragmentManager = getSupportFragmentManager();
+//        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+//
+//        // MainFragment のインスタンスを作成
+//        Fragment mainFragment = new MainFragment();
+//
+//        // fragment_container に MainFragment を追加
+//        fragmentTransaction.replace(R.id.fragment_container, mainFragment);
+//        fragmentTransaction.commit();
+//    }
 }

@@ -27,12 +27,25 @@
         app:layout_constraintEnd_toEndOf="parent"
         android:background="#9c9c9c"/>
 
-
     <!-- スクロール可能なビュー -->
+<!--    <FrameLayout-->
+<!--        android:id="@+id/fragment_container"-->
+<!--        android:layout_width="413dp"-->
+<!--        android:layout_height="300dp"-->
+<!--        app:layout_constraintBottom_toBottomOf="parent"-->
+<!--        app:layout_constraintEnd_toEndOf="parent"-->
+<!--        app:layout_constraintHorizontal_bias="0.0"-->
+<!--        app:layout_constraintStart_toStartOf="parent"-->
+<!--        app:layout_constraintTop_toTopOf="parent"-->
+<!--        app:layout_constraintVertical_bias="0.224" />-->
+
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_marginTop="100dp">
+
+
+
 
 
 
@@ -62,7 +75,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
-                    android:padding="16dp"
+                    android:padding="10dp"
                     android:background="#DEDEDE">
 
                 <!-- 記号部分 -->
@@ -85,7 +98,8 @@
                     android:textStyle="bold"
                     android:textSize="40sp"
                     android:textColor="#000000" />
-            </LinearLayout>
+                </LinearLayout>
+
 
 
             <!-- サイズの視覚的ガイド -->
@@ -177,6 +191,9 @@
                 android:orientation="vertical"
                 android:padding="10dp">
 
+
+
+
                 <!-- タップ可能なラベル -->
                 <TextView
                     android:id="@+id/predict_weight_label"
@@ -241,6 +258,128 @@
 
                 </LinearLayout>
 
+            </LinearLayout>
+
+
+
+            <LinearLayout
+                android:id="@+id/ripe_feedback_section"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="10dp">
+
+
+                <LinearLayout
+                    android:id="@+id/ripe_feedback_container"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:padding="10dp"
+                    android:background="#DEDEDE">
+
+                    <!-- 記号部分 -->
+                    <TextView
+                        android:id="@+id/toggle_icon_2"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="＞"
+                        android:textStyle="bold"
+                        android:textSize="40sp"
+                        android:textColor="#000000"
+                        android:paddingEnd="8dp" />
+
+                    <!-- タイトル部分 -->
+                    <TextView
+                        android:id="@+id/ripe_feedback_title"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="熟度判定: \n (半熟,完熟,過熟)"
+                        android:textStyle="bold"
+                        android:textSize="40sp"
+                        android:textColor="#000000" />
+                </LinearLayout>
+
+
+
+                <!-- サイズの視覚的ガイド -->
+                <LinearLayout
+                    android:id="@+id/ripe_feedback_details"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:visibility="gone"
+                    android:background="#2b2b2b">
+
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="ここでは熟度判定の閾値を設定できます。"
+                        android:textSize="18sp"
+                        android:paddingTop="16dp" />
+
+                    <TextView
+                        android:id="@+id/ripefeedback_halfripe_ripe_label"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="半熟-完熟の閾値"
+                        android:textSize="25sp"
+                        android:paddingTop="12dp" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="熟度の半熟と完熟の閾値を設定。\n ※30以下では設定しない"
+                        android:textSize="12sp"
+                        android:paddingTop="12dp" />
+
+                    <SeekBar
+                        android:id="@+id/ripefeedback_halfripe_ripe_seekbar"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:max="100"
+                        android:thumb="@drawable/custom_thumb" />
+
+                    <TextView
+                        android:id="@+id/ripefeedback_halfripe_ripe_value"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="現在の値: 10"
+                        android:paddingTop="8dp"
+                        android:textSize="25sp"/>
+
+                    <!-- 閾値のスライダー設定（M-L） -->
+                    <TextView
+                        android:id="@+id/ripefeedback_ripe_overripe_label"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="完熟-過熟の閾値"
+                        android:textSize="25sp"
+                        android:paddingTop="12dp" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="熟度の完熟と過熟の閾値を設定。"
+                        android:textSize="12sp"
+                        android:paddingTop="12dp" />
+
+                    <SeekBar
+                        android:id="@+id/ripefeedback_ripe_overripe_seekbar"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:max="100"
+                        android:thumb="@drawable/custom_thumb" />
+
+                    <TextView
+                        android:id="@+id/ripefeedback_ripe_overripe_value"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="現在の値: 20"
+                        android:paddingTop="8dp"
+                        android:textSize="25sp"/>
+                </LinearLayout>
             </LinearLayout>
 
 
