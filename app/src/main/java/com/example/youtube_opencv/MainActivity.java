@@ -401,6 +401,11 @@ public class MainActivity extends CameraActivity implements CameraBridgeViewBase
         //マーカー用パラメータ
         Scalar marker_lower = new Scalar(100,150,0);
         Scalar marker_higher = new Scalar(140,255,255);
+
+//        Scalar marker_lower = new Scalar(22,230,0);
+//        Scalar marker_higher = new Scalar(30,255,255);
+
+
         //inputimage
         Core.inRange(hsvImage_input,marker_lower, marker_higher,mask_maker);
 

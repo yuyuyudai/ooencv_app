@@ -221,7 +221,7 @@ public class SettingActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 if (lowerBoundDetails.getVisibility() == View.GONE) {
-                    lowerBoundDetails.setVisibility(View.VISIBLE);
+                    lowerBoundDetails.setVisibility(View.GONE);
                 } else {
                     lowerBoundDetails.setVisibility(View.GONE);
                 }
@@ -247,7 +247,7 @@ public class SettingActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 if (slopeDetails.getVisibility() == View.GONE) {
-                    slopeDetails.setVisibility(View.VISIBLE);
+                    slopeDetails.setVisibility(View.GONE);
                 } else {
                     slopeDetails.setVisibility(View.GONE);
                 }
