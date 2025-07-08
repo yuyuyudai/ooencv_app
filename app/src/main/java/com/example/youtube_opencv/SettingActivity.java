@@ -108,13 +108,13 @@ public class SettingActivity extends AppCompatActivity {
 
         //sizeseekbar
         //size
-        float initialDisplayValue_SM = 3.0f;
-        float initialDisplayValue_ML = 5.0f;
+        float initialDisplayValue_SM = 7.0f;
+        float initialDisplayValue_ML = 8.2f;
         //weight
-        float initialDisplayValue_Weight = 3.0f;
+        float initialDisplayValue_Weight = 1.45f;
         //ripefeedback
-        float initialDisplayValue_halfripe_ripe = 60.0f;
-        float initialDisplayValue_ripe_overripe = 80.0f;
+        float initialDisplayValue_halfripe_ripe = 85.0f;
+        float initialDisplayValue_ripe_overripe = 90.0f;
 
         int initialProgress_SM = (int)(initialDisplayValue_SM * 10);
         int initialProgress_ML = (int)(initialDisplayValue_ML*10);
@@ -128,9 +128,9 @@ public class SettingActivity extends AppCompatActivity {
         float savedSaturation = sharedPref.getFloat("dr_lowerBound_2", 120);
         float savedValue = sharedPref.getFloat("dr_lowerBound_3", 78);
         float savedSlope = sharedPref.getFloat("slope_of_predict_line", 0.0199f);
-        float defaultThresholdSM = sharedPref.getFloat("Sizethreshold_S_M", 3.0f);
-        float defaultThresholdML = sharedPref.getFloat("Sizethreshold_M_L", 5.0f);
-        float defaultWeight = sharedPref.getFloat("weightPredictionFactor", 3.0f);
+        float defaultThresholdSM = sharedPref.getFloat("Sizethreshold_S_M", 7.0f);
+        float defaultThresholdML = sharedPref.getFloat("Sizethreshold_M_L", 8.2f);
+        float defaultWeight = sharedPref.getFloat("weightPredictionFactor", 1.77f);//レプリカ1.45f;
         float defaultHalfRipe_Ripe = sharedPref.getFloat("ripefeedback_HalfRipe_Ripe", 60.0f);
         float defaultRipe_OverRipe = sharedPref.getFloat("ripefeedback_Ripe_OverRipe", 80.0f);
 

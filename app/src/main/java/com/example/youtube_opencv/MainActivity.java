@@ -376,7 +376,7 @@ public class MainActivity extends CameraActivity implements CameraBridgeViewBase
 
         //イチゴ用パラメータ
         Scalar dr_lowerBound = new Scalar(0,120,78);//本物(0, 127, 108)　　レプリカ(0,120,78)
-        Scalar dr_upperBound = new Scalar(13, 255, 255);//本物(15, 251,255)　レプリカ(13, 255, 255)
+        Scalar dr_upperBound = new Scalar(13, 251,255);//本物(15, 251,255)　レプリカ(13, 255, 255)
 
         //inputimage
         Core.inRange(hsvImage_input, dr_lowerBound, dr_upperBound, maskRed_0);
@@ -386,7 +386,7 @@ public class MainActivity extends CameraActivity implements CameraBridgeViewBase
         Mat maskRed_180 = new Mat();
 
         //イチゴ用パラメータ
-        Scalar high_dr_lowerBound = new Scalar(160,50,24);//本物(177,127,108)　　レプリカ(172,120,34)
+        Scalar high_dr_lowerBound = new Scalar(160,50,24);//本物(174,127,108)　　レプリカ(172,120,34)  自作レプリカ(160,50,24)
         Scalar high_dr_upperBound = new Scalar(179,255,255);//本物(179,251,255)　　レプリカ(179,255,255)
 
         //inputimage
@@ -410,19 +410,19 @@ public class MainActivity extends CameraActivity implements CameraBridgeViewBase
         Core.inRange(hsvImage_input,marker_lower, marker_higher,mask_maker);
 
         Mat maskWhite_st = new Mat();
-        Scalar wh_st_lowerBound = new Scalar(0, 50, 50);//本物(20, 11, 150)　　レプリカ(20, 29, 103)
-        Scalar wh_st_upperBound = new Scalar(30, 255, 255);//本物(40, 199, 255)　レプリカ(60, 137, 255)
+        Scalar wh_st_lowerBound = new Scalar(0, 50, 50);//本物(20, 11, 150)　　レプリカ(20, 29, 103)　自作レプリカ(0, 50, 50)
+        Scalar wh_st_upperBound = new Scalar(30, 255, 255);//本物(40, 199, 255)　レプリカ(60, 137, 255)　自作レプリカ(30, 255, 255)
         Core.inRange(hsvImage_input, wh_st_lowerBound , wh_st_upperBound, maskWhite_st);
 
         // いちごの緑
         Mat maskGreen_st = new Mat();
-        Scalar gr_st_lowerBound = new Scalar(20, 29, 103);//本物(20, 11, 150)　　レプリカ(20, 29, 103)
-        Scalar gr_st_upperBound = new Scalar(30, 255, 255);//本物(40, 199, 255)　レプリカ(60, 137, 255)
+        Scalar gr_st_lowerBound = new Scalar(20, 29, 103);//本物(20, 11, 150)　　レプリカ(20, 29, 103) 自作レプリカ(20, 29, 103)
+        Scalar gr_st_upperBound = new Scalar(30, 255, 255);//本物(40, 199, 255)　レプリカ(60, 137, 255) 自作レプリカ(30, 255, 255)
         Core.inRange(hsvImage_input, gr_st_lowerBound , gr_st_upperBound, maskGreen_st);
         //いちごの緑（境界）
         Mat maskGreen_border = new Mat();
-        Scalar gr_border_lowerBound = new Scalar(14,120,78);//本物(15, 100, 150)　　レプリカ(14,254,103)
-        Scalar gr_border_upperBound = new Scalar(20,255,255);//本物(20, 251,255)　　レプリカ(20,255,255)
+        Scalar gr_border_lowerBound = new Scalar(14,120,78);//本物(15, 11, 150)　　レプリカ(14,254,103)　自作レプリカ(14,120,78)
+        Scalar gr_border_upperBound = new Scalar(20,255,255);//本物(20, 251,255)　　レプリカ(20,255,255)　自作レプリカ(20,255,255)
         Core.inRange(hsvImage_input, gr_border_lowerBound, gr_border_upperBound, maskGreen_border);
         //maskGreen_stとmaskGreen_borderを合わせる
 
@@ -635,9 +635,9 @@ public class MainActivity extends CameraActivity implements CameraBridgeViewBase
 
 
         //初期表示値
-        float initialDisplayValue_SM =3.0f;
-        float initialDisplayValue_ML =5.0f;
-        float initialDisplayValue_weight = 3.0f;
+        float initialDisplayValue_SM =7.0f;
+        float initialDisplayValue_ML =8.2f;
+        float initialDisplayValue_weight = 1.77f; //レプリカ1.45f;
         float initialDisplayValue_halfripe_ripe = 60.0f;
         float initialDisplayValue_ripe_overripe = 80.0f;
 
@@ -753,7 +753,7 @@ public class MainActivity extends CameraActivity implements CameraBridgeViewBase
                     coloredBox_harf.setVisibility(View.GONE);
                     coloredBox_ripe.setVisibility(View.GONE);
                     coloredText_overripe.setVisibility(View.GONE);
-                } else if (ratio >= 30 && ratio < ripefeedback_HalfRipe_Ripe) {//40～60はharf_ripeを表示
+                } else if (ratio >= 30 && ratio < 60) {//40～60はharf_ripeを表示
                     introduct.setVisibility(View.GONE);
                     coloredBox_harf.setVisibility(View.VISIBLE);
                     coloredBox_ripe.setVisibility(View.GONE);
@@ -761,7 +761,7 @@ public class MainActivity extends CameraActivity implements CameraBridgeViewBase
                     // 枠線を表示
                     borderView_half_ripe.setVisibility(View.VISIBLE);
 
-                } else if (ripefeedback_HalfRipe_Ripe >= 60 && ratio < ripefeedback_Ripe_OverRipe){//60～80はripeを表示
+                } else if (ratio >= 60 && ratio < 80){//60～80はripeを表示
                     introduct.setVisibility(View.GONE);
                     coloredBox_harf.setVisibility(View.GONE);
                     coloredBox_ripe.setVisibility(View.VISIBLE);
