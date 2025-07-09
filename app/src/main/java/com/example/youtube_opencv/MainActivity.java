@@ -1,6 +1,8 @@
 package com.example.youtube_opencv;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -11,6 +13,7 @@ import android.text.SpannableStringBuilder;
 import android.text.style.RelativeSizeSpan;
 import android.text.style.SuperscriptSpan;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.SurfaceView;
 import android.view.View;
@@ -63,6 +66,11 @@ public class MainActivity extends CameraActivity implements CameraBridgeViewBase
     private boolean              mIsJavaCamera = true;
     private MenuItem             mItemSwitchCamera = null;
 
+    //チュートリアル
+    private static final String PREFS_NAME = "MyPrefs";
+    private static final String KEY_SHOW_TUTORIAL = "show_tutorial";
+
+
     private BaseLoaderCallback mLoaderCallback = new BaseLoaderCallback(this) {
         @Override
         public void onManagerConnected(int status) {
@@ -114,6 +122,41 @@ public class MainActivity extends CameraActivity implements CameraBridgeViewBase
         Imgproc.rectangle(image, rect.tl(), rect.br(), new Scalar(0, 0, 255), 5);
     }
 
+
+    //チュートリアル内容を表示する関数
+    private void showTutorialDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        LayoutInflater inflater = getLayoutInflater();
+
+        View dialogView = inflater.inflate(R.layout.tutorial_dialog, null);
+        builder.setView(dialogView);
+
+        // 「OK」ボタン（普通に閉じる）
+        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+            }
+        });
+
+        // 「二度と表示しない」ボタン（フラグ更新）
+        builder.setNegativeButton("二度と表示しない", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                SharedPreferences prefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
+                SharedPreferences.Editor editor = prefs.edit();
+                editor.putBoolean(KEY_SHOW_TUTORIAL, false);
+                editor.apply();
+                dialog.dismiss();
+            }
+        });
+
+        AlertDialog dialog = builder.create();
+        dialog.show();
+    }
+
+
+
     public MainActivity() {
         Log.i(TAG, "Instantiated new " + this.getClass());
     }
@@ -129,6 +172,13 @@ public class MainActivity extends CameraActivity implements CameraBridgeViewBase
 
         setContentView(R.layout.activity_main);
 
+        // 初回 or ユーザーが非表示にしなければ表示
+        SharedPreferences prefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
+        boolean shouldShow = prefs.getBoolean(KEY_SHOW_TUTORIAL, true);
+
+        if (shouldShow) {
+            showTutorialDialog();
+        }
 
 
         //((Vibrator) getSystemService(Context.VIBRATOR_SERVICE)).vibrate(1000);
