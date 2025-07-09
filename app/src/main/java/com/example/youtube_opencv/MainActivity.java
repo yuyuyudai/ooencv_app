@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Vibrator;
 import android.text.Spannable;
@@ -12,14 +13,17 @@ import android.text.SpannableString;
 import android.text.SpannableStringBuilder;
 import android.text.style.RelativeSizeSpan;
 import android.text.style.SuperscriptSpan;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.SurfaceView;
 import android.view.View;
+import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.VideoView;
 
 import org.opencv.android.BaseLoaderCallback;
 import org.opencv.android.CameraActivity;
@@ -131,6 +135,15 @@ public class MainActivity extends CameraActivity implements CameraBridgeViewBase
         View dialogView = inflater.inflate(R.layout.tutorial_dialog, null);
         builder.setView(dialogView);
 
+        // ✅ VideoView の設定
+        VideoView videoView = dialogView.findViewById(R.id.tutorial_video);
+        String videoPath = "android.resource://" + getPackageName() + "/" + R.raw.tutorial_3; // res/raw/tutorial.mp4
+        videoView.setVideoURI(Uri.parse(videoPath));
+        videoView.setOnPreparedListener(mp -> {
+            mp.setLooping(true); // ループ再生
+            videoView.start();
+        });
+
         // 「OK」ボタン（普通に閉じる）
         builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
             @Override
@@ -151,8 +164,19 @@ public class MainActivity extends CameraActivity implements CameraBridgeViewBase
             }
         });
 
+
         AlertDialog dialog = builder.create();
         dialog.show();
+
+        //ダイアログサイズを画面の幅×高さの80%にする
+        Window window = dialog.getWindow();
+        if (window != null) {
+            DisplayMetrics metrics = new DisplayMetrics();
+            getWindowManager().getDefaultDisplay().getMetrics(metrics);
+            int width = (int) (metrics.widthPixels * 0.9);   // 横幅90%
+            int height = (int) (metrics.heightPixels * 0.95); // 高さ95%
+            window.setLayout(width, height);
+        }
     }
 
 
@@ -172,8 +196,15 @@ public class MainActivity extends CameraActivity implements CameraBridgeViewBase
 
         setContentView(R.layout.activity_main);
 
+
+
         // 初回 or ユーザーが非表示にしなければ表示
         SharedPreferences prefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
+
+        // -----------デバッグ用：設定を初期化（チュートリアルを再表示可能にする）-------------//
+        //prefs.edit().putBoolean(KEY_SHOW_TUTORIAL, true).apply();
+        //----------------------------------------------------------------------------//
+
         boolean shouldShow = prefs.getBoolean(KEY_SHOW_TUTORIAL, true);
 
         if (shouldShow) {

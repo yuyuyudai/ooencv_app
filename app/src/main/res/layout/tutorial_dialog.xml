@@ -10,22 +10,19 @@
         android:orientation="vertical"
         android:gravity="center_horizontal">
 
-        <!-- 画像：画面幅いっぱいに表示 -->
-        <ImageView
-            android:id="@+id/tutorial_image"
+        <!-- 動画：画面幅いっぱいに表示 -->
+        <VideoView
+            android:id="@+id/tutorial_video"
             android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1"
-            android:adjustViewBounds="true"
-            android:scaleType="fitCenter"
-            android:src="@drawable/tutorial_img" />
+            android:layout_height="600dp"
+            android:layout_marginBottom="16dp" />
 
         <!-- 説明文などを追加する場合はここに -->
         <TextView
             android:id="@+id/tutorial_text"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="ここに説明文を入れることができます"
+            android:text="確認ができたら「OK」ボタンを押してください"
             android:textSize="16sp"
             android:paddingTop="16dp"
             android:gravity="center"/>
